@@ -50,6 +50,7 @@ const i18nLang = {
     compliance_review: "合规审查",
     market: "市场",
     shop: "商店",
+    merchant: "入驻",
     services: "投喂",
     bookings: "预约",
     transactions: "交易",
@@ -60,6 +61,7 @@ const i18nLang = {
     live_marketplace: "LIVE MARKETPLACE",
     market_title: "全球认证宠物市场",
     shop_title: "宠物食品玩具与用品商店",
+    merchant_title: "商家入驻与推广",
     services_title: "投喂洗护与宠物服务",
     bookings_title: "服务预约与验收",
     transactions_title: "交易流水与托管状态",
@@ -312,6 +314,70 @@ const i18nLang = {
     today_1800: "今天 18:00",
     photo_note: "回传照片",
     feeding_note: "按平时食量投喂，回传照片",
+    merchant_cta_auth: "商家入驻",
+    merchant_back_login: "登录交易台",
+    merchant_public_eyebrow: "SELL ON PETGLOBAL",
+    merchant_hero_title: "入驻 PetGlobal，面向全球买家销售宠物与宠物用品",
+    merchant_hero_body: "把犬舍猫舍、宠物食品、玩具衣服、洗护服务和跨境运输合规放到同一个可信交易平台，订单、托管付款、审核和提现都能集中管理。",
+    merchant_primary_cta: "申请入驻",
+    merchant_secondary_cta: "查看费用",
+    merchant_fee_title: "平台抽成清晰透明",
+    merchant_pet_fee: "活体宠物：分档抽成 10% / 8% / 6%，每单佣金封顶 $800，跨境合规服务费 $180",
+    merchant_shop_fee: "宠物食品、玩具、衣服、用品：每单抽成 12%，运费由订单另计",
+    merchant_service_fee: "投喂、洗护、寄养、接送服务：每单抽成 15%",
+    merchant_sales_channels: "可招商家类型",
+    merchant_type_breeder: "犬舍、猫舍、繁育商",
+    merchant_type_supplies: "宠物食品、玩具、衣服、用品品牌",
+    merchant_type_service_provider: "投喂、洗护、寄养、训练服务",
+    merchant_type_logistics: "宠物运输与跨境合规服务",
+    merchant_type_clinic: "宠物医院、疫苗和健康证明机构",
+    merchant_type_other: "其他宠物相关商家",
+    merchant_benefit_escrow_title: "托管交易降低纠纷",
+    merchant_benefit_escrow_body: "买家付款先进入平台托管，验收完成后再进入结算。",
+    merchant_benefit_verified_title: "认证资料展示",
+    merchant_benefit_verified_body: "支持商家实名认证、疫苗、芯片、健康证、进出口文件上传。",
+    merchant_benefit_i18n_title: "多语言全球展示",
+    merchant_benefit_i18n_body: "中文、英文自动切换，后续可扩展更多国家语言。",
+    merchant_benefit_ops_title: "库存与订单管理",
+    merchant_benefit_ops_body: "宠物信息、用品库存、服务预约和提现记录集中管理。",
+    merchant_process_title: "入驻流程",
+    merchant_process_apply: "提交资料",
+    merchant_process_review: "平台审核",
+    merchant_process_list: "上架商品",
+    merchant_process_settle: "订单结算",
+    merchant_metric_global: "全球买家入口",
+    merchant_metric_settlement: "托管/提现流程",
+    merchant_metric_categories: "宠物+用品+服务",
+    merchant_lead_title: "提交商家入驻申请",
+    merchant_lead_body: "留下经营信息后，平台会根据国家地区、品类和合规资料安排人工审核。",
+    merchant_business_name: "商家/品牌名称",
+    merchant_contact_name: "联系人",
+    merchant_email: "邮箱",
+    merchant_phone: "WhatsApp/电话",
+    merchant_country_region: "国家/地区",
+    merchant_business_type: "经营类型",
+    merchant_expected_category: "计划上架",
+    merchant_monthly_capacity: "月可供应数量",
+    merchant_message: "补充说明",
+    merchant_business_placeholder: "例如 Kiwi Hills Kennel",
+    merchant_contact_placeholder: "你的姓名",
+    merchant_email_placeholder: "merchant@example.com",
+    merchant_phone_placeholder: "+1 555 0199",
+    merchant_country_placeholder: "United States",
+    merchant_message_placeholder: "说明主营品类、资质文件、目标市场或合作需求",
+    merchant_expected_pets: "活体宠物",
+    merchant_expected_supplies: "宠物食品/玩具/衣服/用品",
+    merchant_expected_services: "投喂/洗护/寄养服务",
+    merchant_expected_logistics: "运输/进出口合规",
+    merchant_expected_multiple: "多品类经营",
+    merchant_capacity_1: "1-10 单/月",
+    merchant_capacity_2: "11-50 单/月",
+    merchant_capacity_3: "51-200 单/月",
+    merchant_capacity_4: "200+ 单/月",
+    merchant_submit: "提交申请",
+    merchant_success: "已提交，平台将在 1-2 个工作日联系你。",
+    merchant_failed: "申请提交失败",
+    merchant_lead_notice: "提交后管理员可在后台查看线索，用于实名认证和类目审核。",
   },
   en: {
     email: "Email",
@@ -327,6 +393,7 @@ const i18nLang = {
     compliance_review: "Compliance review",
     market: "Market",
     shop: "Shop",
+    merchant: "Join",
     services: "Care",
     bookings: "Bookings",
     transactions: "Trades",
@@ -337,6 +404,7 @@ const i18nLang = {
     live_marketplace: "LIVE MARKETPLACE",
     market_title: "Global Verified Pet Market",
     shop_title: "Pet Food, Toys and Supplies Store",
+    merchant_title: "Seller Onboarding and Promotion",
     services_title: "Feeding, Grooming and Pet Care",
     bookings_title: "Service Bookings and Acceptance",
     transactions_title: "Escrow Trades and Order Flow",
@@ -589,6 +657,70 @@ const i18nLang = {
     today_1800: "Today 18:00",
     photo_note: "Return photos",
     feeding_note: "Feed normal portion and return photos",
+    merchant_cta_auth: "Seller onboarding",
+    merchant_back_login: "Log in to workspace",
+    merchant_public_eyebrow: "SELL ON PETGLOBAL",
+    merchant_hero_title: "Join PetGlobal and sell pets and pet supplies to global buyers",
+    merchant_hero_body: "Put breeders, pet food, toys, clothing, care services, and cross-border logistics compliance into one trusted trading platform with orders, escrow payment, reviews, and payouts managed together.",
+    merchant_primary_cta: "Apply to join",
+    merchant_secondary_cta: "View fees",
+    merchant_fee_title: "Transparent platform commission",
+    merchant_pet_fee: "Live pets: tiered commission at 10% / 8% / 6%, capped at $800 per order, plus $180 cross-border compliance service fee",
+    merchant_shop_fee: "Pet food, toys, clothing, and supplies: 12% commission per order, shipping charged separately",
+    merchant_service_fee: "Feeding, grooming, boarding, and pickup services: 15% commission per booking",
+    merchant_sales_channels: "Merchant categories",
+    merchant_type_breeder: "Dog and cat breeders",
+    merchant_type_supplies: "Pet food, toy, clothing, and supplies brands",
+    merchant_type_service_provider: "Feeding, grooming, boarding, and training services",
+    merchant_type_logistics: "Pet transport and cross-border compliance providers",
+    merchant_type_clinic: "Clinics, vaccine, and health certificate providers",
+    merchant_type_other: "Other pet-related businesses",
+    merchant_benefit_escrow_title: "Escrow reduces disputes",
+    merchant_benefit_escrow_body: "Buyer funds are held by the platform and enter settlement after acceptance.",
+    merchant_benefit_verified_title: "Verified business profile",
+    merchant_benefit_verified_body: "Seller identity, vaccine records, chip certificates, health files, and import/export documents are supported.",
+    merchant_benefit_i18n_title: "Global multilingual display",
+    merchant_benefit_i18n_body: "Chinese and English switch automatically, with more languages extendable later.",
+    merchant_benefit_ops_title: "Inventory and order operations",
+    merchant_benefit_ops_body: "Manage pet listings, product stock, service bookings, and payout records in one place.",
+    merchant_process_title: "Onboarding flow",
+    merchant_process_apply: "Submit profile",
+    merchant_process_review: "Platform review",
+    merchant_process_list: "List products",
+    merchant_process_settle: "Settle orders",
+    merchant_metric_global: "Global buyer entry",
+    merchant_metric_settlement: "Escrow and payouts",
+    merchant_metric_categories: "Pets + supplies + services",
+    merchant_lead_title: "Submit seller application",
+    merchant_lead_body: "Leave your business details and the platform will review country, category, and compliance requirements manually.",
+    merchant_business_name: "Business / brand name",
+    merchant_contact_name: "Contact name",
+    merchant_email: "Email",
+    merchant_phone: "WhatsApp / phone",
+    merchant_country_region: "Country / region",
+    merchant_business_type: "Business type",
+    merchant_expected_category: "Planned listings",
+    merchant_monthly_capacity: "Monthly capacity",
+    merchant_message: "Additional notes",
+    merchant_business_placeholder: "e.g. Kiwi Hills Kennel",
+    merchant_contact_placeholder: "Your name",
+    merchant_email_placeholder: "merchant@example.com",
+    merchant_phone_placeholder: "+1 555 0199",
+    merchant_country_placeholder: "United States",
+    merchant_message_placeholder: "Describe categories, compliance files, target markets, or partnership needs",
+    merchant_expected_pets: "Live pets",
+    merchant_expected_supplies: "Pet food / toys / clothing / supplies",
+    merchant_expected_services: "Feeding / grooming / boarding services",
+    merchant_expected_logistics: "Transport / import-export compliance",
+    merchant_expected_multiple: "Multiple categories",
+    merchant_capacity_1: "1-10 orders/month",
+    merchant_capacity_2: "11-50 orders/month",
+    merchant_capacity_3: "51-200 orders/month",
+    merchant_capacity_4: "200+ orders/month",
+    merchant_submit: "Submit application",
+    merchant_success: "Submitted. The platform will contact you within 1-2 business days.",
+    merchant_failed: "Application submission failed",
+    merchant_lead_notice: "After submission, admins can review the lead for identity and category checks.",
   },
 };
 
@@ -968,10 +1100,15 @@ let state = {
 
 const authShell = document.querySelector("#authShell");
 const appShell = document.querySelector("#appShell");
+const merchantPublicShell = document.querySelector("#merchantPublicShell");
+const merchantPublicLanding = document.querySelector("#merchantPublicLanding");
+const merchantLanding = document.querySelector("#merchantLanding");
 const loginForm = document.querySelector("#loginForm");
 const emailInput = loginForm.querySelector('input[type="email"]');
 const passwordInput = loginForm.querySelector('input[type="password"]');
 const roleSelect = document.querySelector("#roleSelect");
+const openMerchantLandingBtn = document.querySelector("#openMerchantLandingBtn");
+const merchantBackToLoginBtn = document.querySelector("#merchantBackToLoginBtn");
 const accountRole = document.querySelector("#accountRole");
 const logoutBtn = document.querySelector("#logoutBtn");
 const listingGrid = document.querySelector("#listingGrid");
@@ -1257,6 +1394,214 @@ function renderShopCategorySelect(select) {
   select.value = selected;
 }
 
+function merchantLandingMarkup(context = "app") {
+  const prefix = context === "public" ? "public" : "app";
+  const benefits = [
+    ["shield-check", "merchant_benefit_escrow_title", "merchant_benefit_escrow_body"],
+    ["badge-check", "merchant_benefit_verified_title", "merchant_benefit_verified_body"],
+    ["languages", "merchant_benefit_i18n_title", "merchant_benefit_i18n_body"],
+    ["boxes", "merchant_benefit_ops_title", "merchant_benefit_ops_body"],
+  ];
+  const businessTypes = [
+    ["breeder", "merchant_type_breeder"],
+    ["supplies", "merchant_type_supplies"],
+    ["service_provider", "merchant_type_service_provider"],
+    ["logistics", "merchant_type_logistics"],
+    ["clinic", "merchant_type_clinic"],
+    ["other", "merchant_type_other"],
+  ];
+  const categories = [
+    ["pets", "merchant_expected_pets"],
+    ["supplies", "merchant_expected_supplies"],
+    ["services", "merchant_expected_services"],
+    ["logistics", "merchant_expected_logistics"],
+    ["multiple", "merchant_expected_multiple"],
+  ];
+  const capacities = [
+    ["1-10", "merchant_capacity_1"],
+    ["11-50", "merchant_capacity_2"],
+    ["51-200", "merchant_capacity_3"],
+    ["200+", "merchant_capacity_4"],
+  ];
+  const process = [
+    "merchant_process_apply",
+    "merchant_process_review",
+    "merchant_process_list",
+    "merchant_process_settle",
+  ];
+
+  return `
+    <section class="merchant-landing" data-merchant-context="${context}">
+      <div class="merchant-hero">
+        <div class="merchant-hero-copy">
+          <p class="eyebrow">${t("merchant_public_eyebrow")}</p>
+          <h3>${t("merchant_hero_title")}</h3>
+          <p>${t("merchant_hero_body")}</p>
+          <div class="merchant-hero-actions">
+            <a class="primary-action" href="#${prefix}-seller-lead">
+              <i data-lucide="send" aria-hidden="true"></i>
+              ${t("merchant_primary_cta")}
+            </a>
+            <a class="secondary-action" href="#${prefix}-merchant-fees">
+              <i data-lucide="receipt-text" aria-hidden="true"></i>
+              ${t("merchant_secondary_cta")}
+            </a>
+          </div>
+        </div>
+        <div class="merchant-hero-visual" aria-hidden="true">
+          <img src="./assets/hero.png" alt="" />
+          <div class="merchant-metrics">
+            <span>${t("merchant_metric_global")}</span>
+            <span>${t("merchant_metric_settlement")}</span>
+            <span>${t("merchant_metric_categories")}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="merchant-section-grid">
+        <article class="merchant-panel" id="${prefix}-merchant-fees">
+          <h3>${t("merchant_fee_title")}</h3>
+          <ul class="merchant-fee-list">
+            <li><i data-lucide="paw-print" aria-hidden="true"></i><span>${t("merchant_pet_fee")}</span></li>
+            <li><i data-lucide="shopping-bag" aria-hidden="true"></i><span>${t("merchant_shop_fee")}</span></li>
+            <li><i data-lucide="hand-heart" aria-hidden="true"></i><span>${t("merchant_service_fee")}</span></li>
+          </ul>
+        </article>
+        <article class="merchant-panel">
+          <h3>${t("merchant_sales_channels")}</h3>
+          <div class="merchant-chip-grid">
+            ${businessTypes.map(([, key]) => `<span>${t(key)}</span>`).join("")}
+          </div>
+        </article>
+      </div>
+
+      <div class="merchant-benefits">
+        ${benefits
+          .map(
+            ([icon, titleKey, bodyKey]) => `
+              <article>
+                <i data-lucide="${icon}" aria-hidden="true"></i>
+                <h3>${t(titleKey)}</h3>
+                <p>${t(bodyKey)}</p>
+              </article>
+            `,
+          )
+          .join("")}
+      </div>
+
+      <div class="merchant-process">
+        <h3>${t("merchant_process_title")}</h3>
+        <div>
+          ${process
+            .map(
+              (key, index) => `
+                <span>
+                  <strong>${index + 1}</strong>
+                  ${t(key)}
+                </span>
+              `,
+            )
+            .join("")}
+        </div>
+      </div>
+
+      <div class="merchant-lead-layout" id="${prefix}-seller-lead">
+        <div class="merchant-lead-copy">
+          <p class="eyebrow">${t("merchant_primary_cta")}</p>
+          <h3>${t("merchant_lead_title")}</h3>
+          <p>${t("merchant_lead_body")}</p>
+          <p class="merchant-notice">${t("merchant_lead_notice")}</p>
+        </div>
+        <form class="merchant-lead-form" data-merchant-lead-form="${context}">
+          <label>
+            ${t("merchant_business_name")}
+            <input name="businessName" placeholder="${t("merchant_business_placeholder")}" required />
+          </label>
+          <div class="form-grid two-cols">
+            <label>
+              ${t("merchant_contact_name")}
+              <input name="contactName" placeholder="${t("merchant_contact_placeholder")}" required />
+            </label>
+            <label>
+              ${t("merchant_email")}
+              <input name="email" type="email" placeholder="${t("merchant_email_placeholder")}" required />
+            </label>
+            <label>
+              ${t("merchant_phone")}
+              <input name="phone" placeholder="${t("merchant_phone_placeholder")}" required />
+            </label>
+            <label>
+              ${t("merchant_country_region")}
+              <input name="country" placeholder="${t("merchant_country_placeholder")}" required />
+            </label>
+            <label>
+              ${t("merchant_business_type")}
+              <select name="businessType">
+                ${businessTypes.map(([value, key]) => `<option value="${value}">${t(key)}</option>`).join("")}
+              </select>
+            </label>
+            <label>
+              ${t("merchant_expected_category")}
+              <select name="expectedCategory">
+                ${categories.map(([value, key]) => `<option value="${value}">${t(key)}</option>`).join("")}
+              </select>
+            </label>
+          </div>
+          <label>
+            ${t("merchant_monthly_capacity")}
+            <select name="monthlyCapacity">
+              ${capacities.map(([value, key]) => `<option value="${value}">${t(key)}</option>`).join("")}
+            </select>
+          </label>
+          <label>
+            ${t("merchant_message")}
+            <textarea name="message" rows="4" placeholder="${t("merchant_message_placeholder")}"></textarea>
+          </label>
+          <button class="primary-action" type="submit">
+            <i data-lucide="send" aria-hidden="true"></i>
+            ${t("merchant_submit")}
+          </button>
+          <p class="form-status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  `;
+}
+
+function bindMerchantLeadForms(root = document) {
+  root.querySelectorAll("[data-merchant-lead-form]").forEach((form) => {
+    form.addEventListener("submit", submitMerchantLead);
+  });
+}
+
+function renderMerchantLanding() {
+  if (merchantLanding) {
+    merchantLanding.innerHTML = merchantLandingMarkup("app");
+    bindMerchantLeadForms(merchantLanding);
+  }
+  if (merchantPublicLanding) {
+    merchantPublicLanding.innerHTML = merchantLandingMarkup("public");
+    bindMerchantLeadForms(merchantPublicLanding);
+  }
+}
+
+function showMerchantPublicPage() {
+  state.authed = false;
+  authShell.classList.add("is-hidden");
+  appShell.classList.add("is-hidden");
+  merchantPublicShell.classList.remove("is-hidden");
+  render();
+  window.history.replaceState({}, "", "#merchant");
+}
+
+function showLoginPage() {
+  merchantPublicShell.classList.add("is-hidden");
+  appShell.classList.add("is-hidden");
+  authShell.classList.remove("is-hidden");
+  window.history.replaceState({}, "", window.location.pathname);
+  render();
+}
+
 function renderAllPageText() {
   document.documentElement.lang = currentLang === "zh" ? "zh-CN" : "en";
   document.title = currentLang === "zh" ? "PetGlobal Trade - 全球宠物交易与投喂服务" : "PetGlobal Trade - Global Pet Trade and Care";
@@ -1271,6 +1616,8 @@ function renderAllPageText() {
   setSelectOptionText(roleSelect, "seller", t("seller"));
   setSelectOptionText(roleSelect, "admin", t("admin"));
   loginForm.querySelector("button").lastChild.textContent = ` ${t("login_workspace")}`;
+  if (openMerchantLandingBtn) openMerchantLandingBtn.lastChild.textContent = ` ${t("merchant_cta_auth")}`;
+  if (merchantBackToLoginBtn) merchantBackToLoginBtn.lastChild.textContent = ` ${t("merchant_back_login")}`;
   const trustItems = document.querySelectorAll(".auth-panel .trust-strip span");
   [t("escrow_trade"), t("commission_profit"), t("compliance_review")].forEach((text, index) => {
     if (trustItems[index]) trustItems[index].textContent = text;
@@ -1279,6 +1626,7 @@ function renderAllPageText() {
   const navLabels = {
     market: "market",
     shop: "shop",
+    merchant: "merchant",
     services: "services",
     bookings: "bookings",
     transactions: "transactions",
@@ -1868,6 +2216,52 @@ async function submitShopOrder(payload) {
   }
 }
 
+async function submitMerchantLead(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const status = form.querySelector(".form-status");
+  const submitButton = form.querySelector('button[type="submit"]');
+  const data = new FormData(form);
+  const payload = {
+    businessName: data.get("businessName"),
+    contactName: data.get("contactName"),
+    email: data.get("email"),
+    phone: data.get("phone"),
+    country: data.get("country"),
+    businessType: data.get("businessType"),
+    expectedCategory: data.get("expectedCategory"),
+    monthlyCapacity: data.get("monthlyCapacity"),
+    message: data.get("message") || "",
+  };
+
+  if (submitButton) submitButton.disabled = true;
+  if (status) {
+    status.textContent = "";
+    status.className = "form-status";
+  }
+
+  try {
+    await apiFetch("/api/seller-leads", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    form.reset();
+    if (status) {
+      status.textContent = t("merchant_success");
+      status.classList.add("is-success");
+    }
+  } catch (error) {
+    if (status) {
+      status.textContent = `${t("merchant_failed")}: ${error.message}`;
+      status.classList.add("is-error");
+    } else {
+      alert(`${t("merchant_failed")}: ${error.message}`);
+    }
+  } finally {
+    if (submitButton) submitButton.disabled = false;
+  }
+}
+
 async function continueShopPayment(orderId) {
   try {
     const data = await apiFetch(`/api/shop/orders/${orderId}/pay`, {
@@ -2426,6 +2820,7 @@ function setView(view) {
   const titles = {
     market: "market_title",
     shop: "shop_title",
+    merchant: "merchant_title",
     services: "services_title",
     bookings: "bookings_title",
     transactions: "transactions_title",
@@ -2439,6 +2834,7 @@ function setView(view) {
 
 function render() {
   renderAllPageText();
+  renderMerchantLanding();
   const role = state.user?.role || roleSelect.value;
   const accountText = currentLang === "zh" ? `${roleText(role)}${t("account")}` : `${roleText(role)} ${t("account")}`;
   accountRole.textContent = `${accountText}${state.apiOnline ? "" : ` · ${t("demo_data")}`}`;
@@ -2452,7 +2848,7 @@ function render() {
   serviceFilterButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.serviceFilter === state.serviceFilter);
   });
-  setView(state.view);
+  if (state.authed) setView(state.view);
   renderMetrics();
   renderListings();
   renderShop();
@@ -2556,6 +2952,7 @@ async function showApp(user, token) {
   state.authed = true;
   if (state.token) localStorage.setItem("pg_token", state.token);
   authShell.classList.add("is-hidden");
+  merchantPublicShell.classList.add("is-hidden");
   appShell.classList.remove("is-hidden");
   await loadData();
   render();
@@ -2582,6 +2979,9 @@ roleSelect.addEventListener("change", () => {
   emailInput.value = demoCredentials[roleSelect.value] || demoCredentials.buyer;
 });
 
+openMerchantLandingBtn?.addEventListener("click", showMerchantPublicPage);
+merchantBackToLoginBtn?.addEventListener("click", showLoginPage);
+
 if (langSelect) {
   langSelect.value = currentLang;
   langSelect.addEventListener("change", (event) => {
@@ -2601,6 +3001,7 @@ logoutBtn.addEventListener("click", async () => {
   state.user = null;
   state.token = "";
   localStorage.removeItem("pg_token");
+  merchantPublicShell.classList.add("is-hidden");
   appShell.classList.add("is-hidden");
   authShell.classList.remove("is-hidden");
   if (window.lucide) window.lucide.createIcons();
@@ -2769,6 +3170,10 @@ window.addEventListener("load", async () => {
   await loadRuntimeConfig();
   applyReturnParams();
   if (window.lucide) window.lucide.createIcons();
+  if (window.location.hash === "#merchant") {
+    showMerchantPublicPage();
+    return;
+  }
   render();
   if (!state.token) return;
   try {

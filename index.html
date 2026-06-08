@@ -54,6 +54,13 @@
           </button>
         </form>
 
+        <div class="auth-actions">
+          <button class="secondary-action" id="openMerchantLandingBtn" type="button">
+            <i data-lucide="badge-dollar-sign" aria-hidden="true"></i>
+            商家入驻
+          </button>
+        </div>
+
         <div class="trust-strip">
           <span>托管交易</span>
           <span>手续费盈利</span>
@@ -67,6 +74,23 @@
           <strong>USD 2,400</strong>
         </div>
       </aside>
+    </div>
+
+    <div class="merchant-public-shell is-hidden" id="merchantPublicShell">
+      <header class="merchant-public-header">
+        <div class="brand-row compact">
+          <div class="brand-mark">PG</div>
+          <div>
+            <strong>PetGlobal</strong>
+            <span>Merchant</span>
+          </div>
+        </div>
+        <button class="secondary-action" id="merchantBackToLoginBtn" type="button">
+          <i data-lucide="log-in" aria-hidden="true"></i>
+          登录交易台
+        </button>
+      </header>
+      <main id="merchantPublicLanding"></main>
     </div>
 
     <div class="app-shell is-hidden" id="appShell">
@@ -86,6 +110,10 @@
           <button class="nav-item" data-view="shop">
             <i data-lucide="shopping-bag" aria-hidden="true"></i>
             商店
+          </button>
+          <button class="nav-item" data-view="merchant">
+            <i data-lucide="badge-dollar-sign" aria-hidden="true"></i>
+            入驻
           </button>
           <button class="nav-item" data-view="services">
             <i data-lucide="hand-heart" aria-hidden="true"></i>
@@ -204,6 +232,10 @@
             <button class="filter-pill" data-shop-filter="other">其他用品</button>
           </div>
           <div class="service-grid-wide" id="shopGrid"></div>
+        </section>
+
+        <section class="view-panel is-hidden" id="merchantView">
+          <div id="merchantLanding"></div>
         </section>
 
         <section class="view-panel is-hidden" id="servicesView">

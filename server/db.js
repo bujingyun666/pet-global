@@ -210,6 +210,23 @@ export function initializeDatabase() {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS seller_leads (
+      id TEXT PRIMARY KEY,
+      business_name TEXT NOT NULL,
+      contact_name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      phone TEXT NOT NULL,
+      country TEXT NOT NULL,
+      business_type TEXT NOT NULL CHECK (business_type IN ('breeder', 'supplies', 'service_provider', 'logistics', 'clinic', 'other')),
+      expected_category TEXT NOT NULL CHECK (expected_category IN ('pets', 'supplies', 'services', 'logistics', 'multiple')),
+      monthly_capacity TEXT NOT NULL,
+      message TEXT NOT NULL DEFAULT '',
+      status TEXT NOT NULL CHECK (status IN ('new', 'contacted', 'qualified', 'rejected')) DEFAULT 'new',
+      source TEXT NOT NULL DEFAULT 'merchant_landing',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   runMigrations();
@@ -736,5 +753,24 @@ export function toMessage(row) {
     kind: row.kind,
     isRead: Boolean(row.is_read),
     createdAt: row.created_at,
+  };
+}
+
+export function toSellerLead(row) {
+  return {
+    id: row.id,
+    businessName: row.business_name,
+    contactName: row.contact_name,
+    email: row.email,
+    phone: row.phone,
+    country: row.country,
+    businessType: row.business_type,
+    expectedCategory: row.expected_category,
+    monthlyCapacity: row.monthly_capacity,
+    message: row.message || "",
+    status: row.status,
+    source: row.source,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
   };
 }

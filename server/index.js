@@ -25,6 +25,7 @@ import {
   toListing,
   toMessage,
   toOrder,
+  toSellerLead,
   toService,
   toShopOrder,
   toShopProduct,
@@ -136,6 +137,8 @@ const apiText = {
     order_payment_not_pending: "订单不处于待付款状态",
     payout_amount_invalid: "提现金额超过当前可提现余额",
     payout_not_found: "提现申请不存在",
+    seller_lead_submitted: "商家入驻申请已提交",
+    seller_lead_not_found: "商家入驻申请不存在",
     internal_error: "服务器内部错误",
     order_submitted_title: "托管订单已创建",
     order_submitted_body: (petName, orderId) => `${petName} 的订单 ${orderId} 已锁定宠物，请尽快完成托管付款。`,
@@ -172,6 +175,8 @@ const apiText = {
     order_payment_not_pending: "Order payment is not pending",
     payout_amount_invalid: "Withdrawal amount exceeds the currently available balance",
     payout_not_found: "Payout request not found",
+    seller_lead_submitted: "Seller application submitted",
+    seller_lead_not_found: "Seller lead not found",
     internal_error: "Internal server error",
     order_submitted_title: "Escrow order created",
     order_submitted_body: (petName, orderId) => `${petName}'s order ${orderId} has locked the pet. Please complete escrow payment soon.`,
@@ -459,6 +464,22 @@ const payoutStatusSchema = z.object({
 
 const stripeConnectSchema = z.object({
   country: z.string().length(2).transform((value) => value.toUpperCase()),
+});
+
+const sellerLeadSchema = z.object({
+  businessName: z.string().min(2).max(120),
+  contactName: z.string().min(2).max(80),
+  email: z.string().email().max(160),
+  phone: z.string().min(5).max(60),
+  country: z.string().min(2).max(80),
+  businessType: z.enum(["breeder", "supplies", "service_provider", "logistics", "clinic", "other"]),
+  expectedCategory: z.enum(["pets", "supplies", "services", "logistics", "multiple"]),
+  monthlyCapacity: z.string().min(1).max(40),
+  message: z.string().max(600).optional().default(""),
+});
+
+const sellerLeadStatusSchema = z.object({
+  status: z.enum(["new", "contacted", "qualified", "rejected"]),
 });
 
 function centsFromPrice(price) {
@@ -943,6 +964,38 @@ app.get("/api/shop/products", (req, res) => {
     includeInactive: req.query.all === "true" && req.user?.role === "admin",
   });
   res.json({ products: rows.map(toShopProduct) });
+});
+
+app.post("/api/seller-leads", (req, res) => {
+  const parsed = sellerLeadSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json(validationError(req, parsed.error));
+
+  const leadId = `SL-${nanoid(9).toUpperCase()}`;
+  db.prepare(`
+    INSERT INTO seller_leads (
+      id, business_name, contact_name, email, phone, country,
+      business_type, expected_category, monthly_capacity, message, status, source
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'new', 'merchant_landing')
+  `).run(
+    leadId,
+    parsed.data.businessName,
+    parsed.data.contactName,
+    parsed.data.email.toLowerCase(),
+    parsed.data.phone,
+    parsed.data.country,
+    parsed.data.businessType,
+    parsed.data.expectedCategory,
+    parsed.data.monthlyCapacity,
+    parsed.data.message,
+  );
+
+  const lead = db.prepare("SELECT * FROM seller_leads WHERE id = ?").get(leadId);
+  res.status(201).json({
+    ok: true,
+    message: tt(req, "seller_lead_submitted"),
+    lead: toSellerLead(lead),
+  });
 });
 
 app.post(
@@ -1697,6 +1750,10 @@ app.get("/api/admin/overview", requireAuth, requireRole("admin"), (_req, res) =>
   const bookings = getBookingRows({}).map(toBooking);
   const products = getShopProductRows({ includeInactive: true }).map(toShopProduct);
   const shopOrders = getShopOrderRows({}).map(toShopOrder);
+  const sellerLeads = db
+    .prepare("SELECT * FROM seller_leads ORDER BY created_at DESC LIMIT 100")
+    .all()
+    .map(toSellerLead);
   const totalFees = orders.reduce((sum, order) => sum + Math.round(order.fee * 100), 0);
   const serviceFees = bookings.reduce((sum, booking) => sum + Math.round(booking.commission * 100), 0);
   const shopFees = shopOrders.reduce((sum, order) => sum + Math.round(order.commission * 100), 0);
@@ -1708,6 +1765,7 @@ app.get("/api/admin/overview", requireAuth, requireRole("admin"), (_req, res) =>
       orders: orders.length,
       bookings: bookings.length,
       shopOrders: shopOrders.length,
+      sellerLeads: sellerLeads.length,
       gmv: (
         gmv +
         bookings.reduce((sum, booking) => sum + Math.round(booking.amount * 100), 0) +
@@ -1721,8 +1779,45 @@ app.get("/api/admin/overview", requireAuth, requireRole("admin"), (_req, res) =>
     bookings,
     products,
     shopOrders,
+    sellerLeads,
     riskQueue: listings.filter((listing) => listing.risk !== "low" || listing.status === "review"),
   });
+});
+
+app.get("/api/admin/seller-leads", requireAuth, requireRole("admin"), (req, res) => {
+  const params = {};
+  const clauses = [];
+  if (req.query.status) {
+    clauses.push("status = @status");
+    params.status = String(req.query.status);
+  }
+  const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
+  const leads = db
+    .prepare(`
+      SELECT *
+      FROM seller_leads
+      ${where}
+      ORDER BY created_at DESC
+      LIMIT 100
+    `)
+    .all(params)
+    .map(toSellerLead);
+  res.json({ leads });
+});
+
+app.patch("/api/admin/seller-leads/:id/status", requireAuth, requireRole("admin"), (req, res) => {
+  const parsed = sellerLeadStatusSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json(validationError(req, parsed.error));
+
+  const update = db.prepare(`
+    UPDATE seller_leads
+    SET status = ?, updated_at = CURRENT_TIMESTAMP
+    WHERE id = ?
+  `).run(parsed.data.status, req.params.id);
+  if (update.changes !== 1) return res.status(404).json({ error: tt(req, "seller_lead_not_found") });
+
+  const lead = db.prepare("SELECT * FROM seller_leads WHERE id = ?").get(req.params.id);
+  res.json({ lead: toSellerLead(lead) });
 });
 
 app.patch("/api/admin/listings/:id/review", requireAuth, requireRole("admin"), (req, res) => {
