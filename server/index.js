@@ -88,7 +88,7 @@ const allowedOrigins = new Set(
 const upload = multer({
   storage: multer.diskStorage({
     destination: (_req, file, cb) => {
-      const type = file.fieldname === "petImage" ? "images" : "documents";
+      const type = ["petImage", "productImage"].includes(file.fieldname) ? "images" : "documents";
       const dir = path.join(uploadRoot, type);
       fs.mkdirSync(dir, { recursive: true });
       cb(null, dir);
@@ -1074,7 +1074,7 @@ app.post(
           originalName: items[0].originalname,
           mimeType: items[0].mimetype,
           size: items[0].size,
-          url: `/uploads/${items[0].fieldname === "petImage" ? "images" : "documents"}/${items[0].filename}`,
+          url: `/uploads/${["petImage", "productImage"].includes(items[0].fieldname) ? "images" : "documents"}/${items[0].filename}`,
         },
       ]),
     );
