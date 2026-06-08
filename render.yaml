@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: pet-global-api
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    disk:
+      name: pet-global-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_PATH
+        value: ./data/petglobal.sqlite
+      - key: COMMISSION_RATE
+        value: "0.08"
+      - key: MOCK_PAYMENT_MODE
+        value: "true"
+      - key: I18N_ENABLED
+        value: "true"
+      - key: I18N_DEFAULT_LANG
+        value: en
+      - key: ALLOWED_ORIGINS
+        value: https://pet-global-mocha.vercel.app

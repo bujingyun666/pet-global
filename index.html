@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PetGlobal Trade</title>
+    <meta
+      name="description"
+      content="A global pet trading marketplace prototype with verified listings, escrow transactions, and commission revenue."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="./config.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="lang-switch" id="langSwitch">
+      <select id="langSelect" aria-label="Language">
+        <option value="zh">中文</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+
+    <div class="auth-shell" id="authShell">
+      <main class="auth-panel" aria-labelledby="authTitle">
+        <div class="brand-row">
+          <div class="brand-mark">PG</div>
+          <div>
+            <p class="eyebrow">GLOBAL PET ESCROW MARKET</p>
+            <h1 id="authTitle">PetGlobal Trade</h1>
+          </div>
+        </div>
+
+        <form class="login-form" id="loginForm">
+          <label>
+            邮箱
+            <input type="email" value="buyer@petglobal.test" autocomplete="email" required />
+          </label>
+          <label>
+            密码
+            <input type="password" value="petglobal2026" autocomplete="current-password" required />
+          </label>
+          <label>
+            账户类型
+            <select id="roleSelect">
+              <option value="buyer">买家</option>
+              <option value="seller">卖家</option>
+              <option value="admin">平台运营</option>
+            </select>
+          </label>
+          <button class="primary-action" type="submit">
+            <i data-lucide="log-in" aria-hidden="true"></i>
+            登录交易台
+          </button>
+        </form>
+
+        <div class="trust-strip">
+          <span>托管交易</span>
+          <span>手续费盈利</span>
+          <span>合规审查</span>
+        </div>
+      </main>
+      <aside class="auth-media" aria-label="Featured verified pets">
+        <img src="./assets/dog.jpg" alt="Verified border collie listing" />
+        <div class="media-ticket">
+          <span>Escrow ready</span>
+          <strong>USD 2,400</strong>
+        </div>
+      </aside>
+    </div>
+
+    <div class="app-shell is-hidden" id="appShell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <div class="brand-row compact">
+          <div class="brand-mark">PG</div>
+          <div>
+            <strong>PetGlobal</strong>
+            <span>Trade</span>
+          </div>
+        </div>
+        <nav class="main-nav">
+          <button class="nav-item is-active" data-view="market">
+            <i data-lucide="store" aria-hidden="true"></i>
+            市场
+          </button>
+          <button class="nav-item" data-view="services">
+            <i data-lucide="hand-heart" aria-hidden="true"></i>
+            投喂
+          </button>
+          <button class="nav-item" data-view="bookings">
+            <i data-lucide="calendar-check" aria-hidden="true"></i>
+            预约
+          </button>
+          <button class="nav-item" data-view="transactions">
+            <i data-lucide="receipt-text" aria-hidden="true"></i>
+            交易
+          </button>
+          <button class="nav-item" data-view="messages">
+            <i data-lucide="message-circle" aria-hidden="true"></i>
+            消息
+          </button>
+          <button class="nav-item" data-view="wallet">
+            <i data-lucide="wallet-cards" aria-hidden="true"></i>
+            钱包
+          </button>
+          <button class="nav-item" data-view="compliance">
+            <i data-lucide="shield-check" aria-hidden="true"></i>
+            合规
+          </button>
+          <button class="nav-item" data-view="revenue">
+            <i data-lucide="chart-no-axes-combined" aria-hidden="true"></i>
+            收益
+          </button>
+        </nav>
+        <div class="sidebar-footer">
+          <span id="accountRole">买家账户</span>
+          <button class="ghost-icon" id="logoutBtn" type="button" aria-label="退出登录" title="退出登录">
+            <i data-lucide="log-out" aria-hidden="true"></i>
+          </button>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">LIVE MARKETPLACE</p>
+            <h2 id="viewTitle">全球认证宠物市场</h2>
+          </div>
+          <div class="topbar-actions">
+            <label class="search-box">
+              <i data-lucide="search" aria-hidden="true"></i>
+              <input id="searchInput" type="search" placeholder="搜索品种、国家、卖家" />
+            </label>
+            <select id="currencySelect" aria-label="货币">
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="CNY">CNY</option>
+              <option value="JPY">JPY</option>
+            </select>
+            <button class="icon-button" id="newListingBtn" type="button" aria-label="发布宠物" title="发布宠物">
+              <i data-lucide="plus" aria-hidden="true"></i>
+            </button>
+          </div>
+        </header>
+
+        <section class="metrics-grid" aria-label="Marketplace metrics">
+          <article>
+            <span>在售宠物</span>
+            <strong id="metricListings">0</strong>
+          </article>
+          <article>
+            <span>本月成交额</span>
+            <strong id="metricGmv">-</strong>
+          </article>
+          <article>
+            <span>平台手续费</span>
+            <strong id="metricFees">-</strong>
+          </article>
+          <article>
+            <span>合规通过率</span>
+            <strong>96.4%</strong>
+          </article>
+        </section>
+
+        <section class="view-panel" id="marketView">
+          <div class="filters-row" aria-label="Listing filters">
+            <button class="filter-pill is-active" data-filter="all">全部</button>
+            <button class="filter-pill" data-filter="Dog">犬类</button>
+            <button class="filter-pill" data-filter="Cat">猫类</button>
+            <button class="filter-pill" data-filter="Small mammal">小型哺乳</button>
+            <button class="filter-pill" data-filter="Bird">鸟类</button>
+            <button class="filter-pill" data-filter="Equine">马匹</button>
+          </div>
+          <div class="market-layout">
+            <div class="listing-grid" id="listingGrid"></div>
+            <aside class="deal-panel" id="dealPanel" aria-live="polite"></aside>
+          </div>
+        </section>
+
+        <section class="view-panel is-hidden" id="servicesView">
+          <div class="service-hero">
+            <div>
+              <p class="eyebrow">PET CARE SERVICES</p>
+              <h3>交易之外，也能预约投喂、洗护、寄养和接送</h3>
+              <p>参考宠投喂 App 的服务入口：用户下单后进入平台记录，服务完成后再结算给服务者。</p>
+            </div>
+            <img src="./assets/hero.png" alt="Pet care service preview" />
+          </div>
+          <div class="filters-row service-filters" aria-label="Service filters">
+            <button class="filter-pill is-active" data-service-filter="all">全部服务</button>
+            <button class="filter-pill" data-service-filter="feeding">上门投喂</button>
+            <button class="filter-pill" data-service-filter="grooming">洗护美容</button>
+            <button class="filter-pill" data-service-filter="boarding">寄养看护</button>
+            <button class="filter-pill" data-service-filter="pickup">接送交接</button>
+          </div>
+          <div class="service-grid-wide" id="serviceGrid"></div>
+        </section>
+
+        <section class="view-panel is-hidden" id="bookingsView">
+          <div class="ops-grid">
+            <article class="ops-panel">
+              <h3>服务预约</h3>
+              <div id="bookingList" class="booking-list"></div>
+            </article>
+            <article class="ops-panel">
+              <h3>服务验收标准</h3>
+              <ul class="check-list">
+                <li><i data-lucide="check" aria-hidden="true"></i> 投喂后回传食盆、水碗、门窗和排便照片</li>
+                <li><i data-lucide="check" aria-hidden="true"></i> 洗护服务记录皮肤、耳道和异常情况</li>
+                <li><i data-lucide="check" aria-hidden="true"></i> 接送交接必须拍摄运输箱和芯片核对视频</li>
+                <li><i data-lucide="check" aria-hidden="true"></i> 服务完成后进入平台结算队列</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="view-panel is-hidden" id="transactionsView">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>交易号</th>
+                  <th>宠物</th>
+                  <th>国家</th>
+                  <th>买家</th>
+                  <th>成交额</th>
+                  <th>手续费</th>
+                  <th>状态</th>
+                </tr>
+              </thead>
+              <tbody id="transactionBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view-panel is-hidden" id="messagesView">
+          <div class="message-list" id="messageList"></div>
+        </section>
+
+        <section class="view-panel is-hidden" id="walletView">
+          <div class="revenue-layout">
+            <div class="wallet-panel" id="walletSummary"></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>编号</th>
+                    <th>类型</th>
+                    <th>项目</th>
+                    <th>预计入账</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody id="walletRows"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="view-panel is-hidden" id="complianceView">
+          <div class="ops-grid">
+            <article class="ops-panel">
+              <h3>交易准入</h3>
+              <ul class="check-list">
+                <li><i data-lucide="check" aria-hidden="true"></i> 卖家身份、繁育许可、历史评价</li>
+                <li><i data-lucide="check" aria-hidden="true"></i> 微芯片编号、疫苗记录、健康证明</li>
+                <li><i data-lucide="check" aria-hidden="true"></i> 买卖双方国家进口/出口规则</li>
+                <li><i data-lucide="check" aria-hidden="true"></i> 运输商资质、航线、福利检查点</li>
+              </ul>
+            </article>
+            <article class="ops-panel">
+              <h3>风险队列</h3>
+              <div id="riskQueue" class="risk-list"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view-panel is-hidden" id="revenueView">
+          <div class="revenue-layout">
+            <div class="fee-calculator">
+              <h3>手续费计算</h3>
+              <label>
+                成交价
+                <input id="calcPrice" type="number" min="100" step="50" value="2400" />
+              </label>
+              <label>
+                平台费率
+                <input id="calcRate" type="range" min="3" max="15" step="0.5" value="8" />
+                <span id="rateValue">8%</span>
+              </label>
+              <label>
+                跨境合规服务费
+                <input id="calcService" type="number" min="0" step="10" value="180" />
+              </label>
+              <output id="calcOutput"></output>
+            </div>
+            <div class="revenue-bars" id="revenueBars" aria-label="Commission revenue by region"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="listingDialog">
+      <form method="dialog" class="dialog-panel" id="listingForm">
+        <header>
+          <h3>发布宠物</h3>
+          <button class="ghost-icon" value="cancel" type="submit" aria-label="关闭" title="关闭">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+        </header>
+        <label>
+          宠物名称
+          <input name="name" value="Milo" required />
+        </label>
+        <label>
+          品种
+          <input name="breed" value="Golden Retriever" required />
+        </label>
+        <label>
+          国家
+          <input name="country" value="Canada" required />
+        </label>
+        <label>
+          价格 USD
+          <input name="price" type="number" min="100" value="2100" required />
+        </label>
+        <button class="primary-action" value="default" type="submit">
+          <i data-lucide="upload-cloud" aria-hidden="true"></i>
+          提交审核
+        </button>
+      </form>
+    </dialog>
+
+    <dialog id="checkoutDialog">
+      <form method="dialog" class="dialog-panel checkout-form" id="checkoutForm">
+        <header>
+          <h3 id="checkoutDialogTitle">提交托管订单</h3>
+          <button class="ghost-icon" value="cancel" type="submit" aria-label="关闭" title="关闭">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+        </header>
+        <input name="listingId" type="hidden" />
+        <div class="checkout-summary" id="checkoutSummary"></div>
+        <div class="form-grid two-cols">
+          <label>
+            联系人
+            <input name="contactName" value="Demo Buyer" required />
+          </label>
+          <label>
+            联系电话
+            <input name="contactPhone" value="+1 555 0188" required />
+          </label>
+          <label>
+            目的国家
+            <input name="destinationCountry" value="United States" required />
+          </label>
+          <label>
+            目的城市
+            <input name="destinationCity" value="Los Angeles" required />
+          </label>
+        </div>
+        <label>
+          详细地址
+          <input name="deliveryAddress" value="1200 Petcare Ave, Los Angeles, CA" required />
+        </label>
+        <div class="form-grid two-cols">
+          <label>
+            进口文件
+            <select name="importPermit">
+              <option value="buyer_confirmed">买家已确认进口文件</option>
+              <option value="need_platform_help">需要平台协助</option>
+            </select>
+          </label>
+          <label>
+            运输方式
+            <select name="transportOption">
+              <option value="platform_partner">平台合作运输</option>
+              <option value="seller_arranged">卖家安排运输</option>
+              <option value="buyer_arranged">买家自提/自安排</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          订单备注
+          <input name="buyerNote" value="Please share chip and vaccine files before shipping." />
+        </label>
+        <label class="check-field">
+          <input name="kycConfirmed" type="checkbox" checked required />
+          <span>我确认买家身份、进口规则、收宠验收和托管付款条款</span>
+        </label>
+        <button class="primary-action" value="default" type="submit">
+          <i data-lucide="shield-check" aria-hidden="true"></i>
+          提交托管订单
+        </button>
+      </form>
+    </dialog>
+
+    <dialog id="bookingDialog">
+      <form method="dialog" class="dialog-panel" id="bookingForm">
+        <header>
+          <h3 id="bookingDialogTitle">预约服务</h3>
+          <button class="ghost-icon" value="cancel" type="submit" aria-label="关闭" title="关闭">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+        </header>
+        <input name="serviceId" type="hidden" />
+        <label>
+          宠物名称
+          <input name="petName" value="团团" required />
+        </label>
+        <label>
+          联系电话
+          <input name="contactPhone" value="13800000000" required />
+        </label>
+        <label>
+          预约时间
+          <input name="serviceTime" value="今天 18:00" required />
+        </label>
+        <label>
+          备注
+          <input name="note" value="按平时食量投喂，回传照片" />
+        </label>
+        <button class="primary-action" value="default" type="submit">
+          <i data-lucide="calendar-plus" aria-hidden="true"></i>
+          提交预约
+        </button>
+      </form>
+    </dialog>
+  </body>
+</html>
