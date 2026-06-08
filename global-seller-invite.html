@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PetGlobal Seller Invitation | Publish Pets, Supplies and Services Globally</title>
+    <meta
+      name="description"
+      content="PetGlobal invites breeders, pet supply brands, grooming providers, boarding partners and logistics partners to publish listings for global pet buyers."
+    />
+    <link rel="canonical" href="https://pet-global-mocha.vercel.app/global-seller-invite.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://pet-global-mocha.vercel.app/global-seller-invite.html" />
+    <meta property="og:title" content="PetGlobal Seller Invitation" />
+    <meta
+      property="og:description"
+      content="Publish pets, pet food, toys, clothing, grooming, boarding and transport services for global buyers with escrow and compliance workflows."
+    />
+    <meta property="og:image" content="https://pet-global-mocha.vercel.app/marketing/petglobal-global-poster-wide-en.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="628" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="PetGlobal Seller Invitation" />
+    <meta
+      name="twitter:description"
+      content="Global sellers are invited to publish pets, pet supplies and care services on PetGlobal."
+    />
+    <meta name="twitter:image" content="https://pet-global-mocha.vercel.app/marketing/petglobal-global-poster-wide-en.png" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17211f;
+        --muted: #60716d;
+        --paper: #f7faf9;
+        --panel: #ffffff;
+        --line: #d8e2df;
+        --teal: #117a70;
+        --teal-dark: #0d5f58;
+        --coral: #d76045;
+        --nav: #12332f;
+        --shadow: 0 18px 40px rgba(23, 33, 31, 0.12);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+        background: var(--paper);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .invite-page {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .invite-hero {
+        background:
+          linear-gradient(90deg, rgba(18, 51, 47, 0.96), rgba(18, 51, 47, 0.78)),
+          url("./assets/dog.jpg") center/cover;
+        color: #ffffff;
+      }
+
+      .invite-inner {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+
+      .invite-header {
+        min-height: 74px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .brand-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 900;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+        background: var(--teal);
+        color: #ffffff;
+      }
+
+      .brand-row span {
+        display: block;
+        margin-top: 2px;
+        color: #a7e5db;
+        font-size: 12px;
+        letter-spacing: 0.12em;
+      }
+
+      .invite-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        border-radius: 8px;
+        padding: 0 16px;
+        border: 1px solid transparent;
+        background: var(--teal);
+        color: #ffffff;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .button.secondary {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.22);
+      }
+
+      .button.light {
+        background: #ffffff;
+        color: var(--teal-dark);
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+        gap: 36px;
+        align-items: center;
+        padding: 52px 0 70px;
+      }
+
+      .eyebrow {
+        margin: 0 0 14px;
+        color: #9fe3d9;
+        font-size: 13px;
+        font-weight: 950;
+        letter-spacing: 0.14em;
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 660px;
+        font-size: clamp(42px, 5vw, 74px);
+        line-height: 0.98;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        margin: 22px 0 0;
+        max-width: 610px;
+        color: #e4f4f1;
+        font-size: clamp(18px, 2.1vw, 26px);
+        line-height: 1.35;
+        font-weight: 760;
+      }
+
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .poster-card {
+        margin: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        background: #ffffff;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+      }
+
+      .poster-card img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .poster-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 14px;
+        background: #ffffff;
+      }
+
+      .poster-links a {
+        min-height: 38px;
+        border-radius: 8px;
+        padding: 9px 12px;
+        background: #edf2f0;
+        color: var(--nav);
+        font-size: 14px;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .content-band {
+        padding: 44px 0 60px;
+      }
+
+      .section-head {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 18px;
+        margin-bottom: 20px;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-size: clamp(28px, 3vw, 42px);
+        line-height: 1.05;
+      }
+
+      .section-head p {
+        margin: 0;
+        max-width: 520px;
+        color: var(--muted);
+        line-height: 1.55;
+        font-weight: 720;
+      }
+
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .info-card {
+        min-height: 156px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 20px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+
+      .info-card strong {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--nav);
+        font-size: 20px;
+        line-height: 1.16;
+      }
+
+      .info-card span {
+        color: var(--muted);
+        line-height: 1.48;
+        font-weight: 680;
+      }
+
+      .share-panel {
+        margin-top: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 22px;
+        background: #ffffff;
+        box-shadow: var(--shadow);
+      }
+
+      .share-panel h2 {
+        margin: 0 0 12px;
+        font-size: 26px;
+      }
+
+      .share-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+
+      .share-actions a {
+        min-height: 40px;
+        border-radius: 8px;
+        padding: 10px 12px;
+        background: var(--nav);
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .share-copy {
+        margin: 0;
+        padding: 16px;
+        border-radius: 8px;
+        background: #edf2f0;
+        color: var(--nav);
+        line-height: 1.55;
+        font-weight: 760;
+      }
+
+      .footer-cta {
+        margin-top: 24px;
+        border-radius: 8px;
+        padding: 24px;
+        background: var(--nav);
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .footer-cta strong {
+        display: block;
+        font-size: 26px;
+        line-height: 1.12;
+      }
+
+      .footer-cta span {
+        display: block;
+        margin-top: 8px;
+        color: #bde6df;
+        font-weight: 720;
+      }
+
+      @media (max-width: 880px) {
+        .invite-header,
+        .section-head,
+        .footer-cta {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
+        .invite-nav,
+        .hero-actions {
+          width: 100%;
+        }
+
+        .button {
+          flex: 1;
+        }
+
+        .hero-grid {
+          grid-template-columns: 1fr;
+          padding-top: 34px;
+        }
+
+        .cards-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 560px) {
+        .cards-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .poster-links a {
+          width: 100%;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="invite-page">
+      <section class="invite-hero">
+        <div class="invite-inner">
+          <header class="invite-header">
+            <div class="brand-row">
+              <div class="brand-mark">PG</div>
+              <div>
+                <strong>PetGlobal</strong>
+                <span>GLOBAL PET ESCROW MARKET</span>
+              </div>
+            </div>
+            <nav class="invite-nav" aria-label="Seller invitation links">
+              <a class="button secondary" href="/">Marketplace</a>
+              <a class="button light" href="/#merchant">Apply to Publish</a>
+            </nav>
+          </header>
+
+          <div class="hero-grid">
+            <section>
+              <p class="eyebrow">SELLERS WELCOME · GLOBAL REACH</p>
+              <h1>Invite global pet sellers to publish on PetGlobal</h1>
+              <p class="lead">
+                PetGlobal is opening seller publishing for verified breeders, pet supply brands, grooming and boarding providers,
+                care service partners and pet transport teams.
+              </p>
+              <div class="hero-actions">
+                <a class="button light" href="/#merchant">Apply to Publish</a>
+                <a class="button secondary" href="/marketing/petglobal-global-poster-en.png" download>Download Poster</a>
+              </div>
+            </section>
+
+            <figure class="poster-card">
+              <img
+                src="/marketing/petglobal-global-poster-wide-en.png"
+                alt="PetGlobal English seller invitation poster for global pet marketplace"
+              />
+              <figcaption class="poster-links">
+                <a href="/marketing/petglobal-global-poster-en.png" download>Vertical Poster</a>
+                <a href="/marketing/petglobal-global-poster-wide-en.png" download>Wide Poster</a>
+                <a href="/#merchant">Seller Form</a>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="content-band">
+        <div class="invite-inner">
+          <div class="section-head">
+            <h2>Who should publish?</h2>
+            <p>
+              Use this English invitation link in global groups, seller communities, email outreach, social media posts and partner messages.
+            </p>
+          </div>
+
+          <div class="cards-grid">
+            <article class="info-card">
+              <strong>Pet sellers</strong>
+              <span>Breeders, kennels, catteries and verified live pet merchants.</span>
+            </article>
+            <article class="info-card">
+              <strong>Pet supplies</strong>
+              <span>Food, toys, clothing, travel gear, grooming tools and health products.</span>
+            </article>
+            <article class="info-card">
+              <strong>Care services</strong>
+              <span>Grooming, boarding, pickup, training and certified care partners.</span>
+            </article>
+            <article class="info-card">
+              <strong>Compliance partners</strong>
+              <span>Transport, import/export support, clinics, vaccine and health certificate providers.</span>
+            </article>
+          </div>
+
+          <article class="share-panel">
+            <h2>Global sharing copy</h2>
+            <div class="share-actions" aria-label="Share PetGlobal seller invitation">
+              <a
+                href="https://twitter.com/intent/tweet?text=PetGlobal%20is%20inviting%20verified%20pet%20sellers%2C%20pet%20supply%20brands%20and%20care%20service%20partners%20to%20publish%20for%20global%20buyers.&url=https%3A%2F%2Fpet-global-mocha.vercel.app%2Fglobal-seller-invite"
+                target="_blank"
+                rel="noopener"
+              >Share on X</a>
+              <a
+                href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fpet-global-mocha.vercel.app%2Fglobal-seller-invite"
+                target="_blank"
+                rel="noopener"
+              >Share on LinkedIn</a>
+              <a
+                href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpet-global-mocha.vercel.app%2Fglobal-seller-invite"
+                target="_blank"
+                rel="noopener"
+              >Share on Facebook</a>
+              <a
+                href="https://api.whatsapp.com/send?text=PetGlobal%20seller%20invitation%3A%20https%3A%2F%2Fpet-global-mocha.vercel.app%2Fglobal-seller-invite"
+                target="_blank"
+                rel="noopener"
+              >Share on WhatsApp</a>
+              <a
+                href="https://t.me/share/url?url=https%3A%2F%2Fpet-global-mocha.vercel.app%2Fglobal-seller-invite&text=PetGlobal%20seller%20invitation"
+                target="_blank"
+                rel="noopener"
+              >Share on Telegram</a>
+            </div>
+            <p class="share-copy">
+              PetGlobal is inviting verified pet sellers, pet supply brands, grooming providers, boarding partners and pet
+              transport teams to publish listings for global buyers. The platform supports escrow payment, seller verification,
+              compliance files, multilingual storefronts and seller payout workflows. Apply here:
+              https://pet-global-mocha.vercel.app/#merchant
+            </p>
+          </article>
+
+          <section class="footer-cta">
+            <div>
+              <strong>Publish pets, supplies and care services for global buyers.</strong>
+              <span>Start with the seller publishing form and let the platform review category and compliance details.</span>
+            </div>
+            <a class="button light" href="/#merchant">Apply to Publish</a>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

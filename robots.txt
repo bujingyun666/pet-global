@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pet-global-mocha.vercel.app/sitemap.xml
