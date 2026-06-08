@@ -149,7 +149,7 @@ const apiText = {
     settlement_title: "结算规则",
     settlement_body: "低风险订单在保障期结束并通过复核后进入自动结算队列。",
     welcome_title: "欢迎来到 PetGlobal",
-    welcome_body: "交易、投喂预约、健康档案、售后和监管消息会集中显示在这里。",
+    welcome_body: "交易、服务预约、健康档案、售后和监管消息会集中显示在这里。",
     receive_check_title: "收宠验收提醒",
     receive_check_body: "收宠时请拍完整开箱视频，并核对芯片编号和健康档案。",
   },
@@ -187,25 +187,13 @@ const apiText = {
     settlement_title: "Settlement rules",
     settlement_body: "Low-risk orders enter automatic settlement after the protection period and review.",
     welcome_title: "Welcome to PetGlobal",
-    welcome_body: "Trades, feeding bookings, health records, after-sales and regulatory messages appear here.",
+    welcome_body: "Trades, service bookings, health records, after-sales and regulatory messages appear here.",
     receive_check_title: "Pet acceptance reminder",
     receive_check_body: "Record a complete unboxing video and verify the chip number and health file.",
   },
 };
 
 const serviceText = {
-  "SV-FEED-001": {
-    zh: {
-      title: "上门投喂与饮水巡检",
-      summary: "按次上门，拍照回传食盆、水碗、排便和门窗状态。",
-      tags: ["实时记录", "可回放", "2小时响应"],
-    },
-    en: {
-      title: "Doorstep Feeding and Water Check",
-      summary: "Per-visit feeding with photo records for food, water, waste and doors/windows.",
-      tags: ["Real-time record", "Playback", "2h response"],
-    },
-  },
   "SV-WASH-001": {
     zh: {
       title: "洗护美容到店预约",
@@ -807,7 +795,7 @@ function markShopOrderPaid({ eventId, provider, orderId, paymentIntentId, payloa
 }
 
 function getServiceRows({ category, search } = {}) {
-  const clauses = ["s.status = 'active'"];
+  const clauses = ["s.status = 'active'", "s.category != 'feeding'"];
   const params = {};
   if (category && category !== "all") {
     clauses.push("s.category = @category");
@@ -834,7 +822,7 @@ function getServiceRows({ category, search } = {}) {
 }
 
 function getBookingRows({ user } = {}) {
-  const clauses = [];
+  const clauses = ["s.category != 'feeding'"];
   const params = {};
   if (user?.role === "buyer") {
     clauses.push("b.buyer_id = @userId");
@@ -1046,7 +1034,7 @@ app.post("/api/service-bookings", requireAuth, requireRole("buyer", "admin"), (r
   const parsed = bookingSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json(validationError(req, parsed.error));
 
-  const service = db.prepare("SELECT * FROM services WHERE id = ? AND status = 'active'").get(parsed.data.serviceId);
+  const service = db.prepare("SELECT * FROM services WHERE id = ? AND status = 'active' AND category != 'feeding'").get(parsed.data.serviceId);
   if (!service) return res.status(404).json({ error: tt(req, "service_not_found") });
   if (service.provider_id === req.user.id) {
     return res.status(409).json({ error: tt(req, "service_self_booking") });
@@ -1097,7 +1085,14 @@ app.patch("/api/service-bookings/:id/status", requireAuth, requireRole("seller",
   const parsed = bookingStatusSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json(validationError(req, parsed.error));
 
-  const booking = db.prepare("SELECT * FROM service_bookings WHERE id = ?").get(req.params.id);
+  const booking = db
+    .prepare(`
+      SELECT b.*
+      FROM service_bookings b
+      JOIN services s ON s.id = b.service_id
+      WHERE b.id = ? AND s.category != 'feeding'
+    `)
+    .get(req.params.id);
   if (!booking) return res.status(404).json({ error: tt(req, "booking_not_found") });
   if (req.user.role !== "admin" && booking.provider_id !== req.user.id) {
     return res.status(403).json({ error: tt(req, "permission_denied") });

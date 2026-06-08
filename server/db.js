@@ -442,16 +442,6 @@ function seedDefaults() {
     `);
     [
       {
-        id: "SV-FEED-001",
-        title: "上门投喂与饮水巡检",
-        category: "feeding",
-        summary: "按次上门，拍照回传食盆、水碗、排便和门窗状态。",
-        city: "Shanghai",
-        priceCents: 3500,
-        image: "/assets/carecat.png",
-        tags: ["实时记录", "可回放", "2小时响应"],
-      },
-      {
         id: "SV-WASH-001",
         title: "洗护美容到店预约",
         category: "grooming",
@@ -516,7 +506,7 @@ function seedDefaults() {
         id: "PR-TOY-001",
         title: "Puzzle treat toy",
         category: "toys",
-        description: "Interactive feeding toy for daily enrichment and slow feeding.",
+        description: "Interactive treat toy for daily enrichment and slower meals.",
         priceCents: 1899,
         stock: 46,
         image: "/assets/hero.png",
@@ -568,7 +558,7 @@ function seedDefaults() {
         userId: null,
         roleScope: "all",
         title: "欢迎来到 PetGlobal",
-        body: "交易、投喂预约、健康档案、售后和监管消息会集中显示在这里。",
+        body: "交易、服务预约、健康档案、售后和监管消息会集中显示在这里。",
         kind: "system",
       },
       {

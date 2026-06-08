@@ -18,7 +18,7 @@ Demo accounts:
 - `seller@petglobal.test` / `petglobal2026`
 - `admin@petglobal.test` / `petglobal2026`
 
-The local full-stack version includes the Petopia-inspired service workflows: feeding, grooming, boarding, pickup bookings, messages, and seller wallet settlement.
+The local full-stack version includes the Petopia-inspired service workflows for grooming, boarding, pickup bookings, messages, and seller wallet settlement.
 
 ## Buyer Checkout Flow
 
@@ -37,8 +37,8 @@ The buyer flow is now a fuller escrow-style demo:
 
 Seller wallet now includes:
 
-- Pending settlement from escrow-funded pet trades and confirmed/completed services.
-- Available withdrawal balance from released pet trades and settled service bookings.
+- Pending settlement from escrow-funded pet trades, paid shop orders, and confirmed/completed services.
+- Available withdrawal balance from released pet trades, paid or delivered shop orders, and settled service bookings.
 - Seller withdrawal requests with bank, PayPal, or Stripe Connect fields.
 - Seller Stripe Connect onboarding for real payout destinations.
 - Admin payout review actions for marking requests as paid or rejected. When Stripe is configured, Stripe Connect requests can create real Stripe transfers.

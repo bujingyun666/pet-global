@@ -51,7 +51,7 @@ const i18nLang = {
     market: "市场",
     shop: "商店",
     merchant: "入驻",
-    services: "投喂",
+    services: "服务",
     bookings: "预约",
     transactions: "交易",
     messages: "消息",
@@ -62,7 +62,7 @@ const i18nLang = {
     market_title: "全球认证宠物市场",
     shop_title: "宠物食品玩具与用品商店",
     merchant_title: "商家入驻与推广",
-    services_title: "投喂洗护与宠物服务",
+    services_title: "洗护寄养与宠物服务",
     bookings_title: "服务预约与验收",
     transactions_title: "交易流水与托管状态",
     messages_title: "平台消息中心",
@@ -157,10 +157,9 @@ const i18nLang = {
     shop_platform_fee: "商品平台佣金",
     product_publish_failed: "商品上架失败",
     shop_order_failed: "商品订单创建失败",
-    service_hero_title: "交易之外，也能预约投喂、洗护、寄养和接送",
-    service_hero_body: "参考宠投喂 App 的服务入口：用户下单后进入平台记录，服务完成后再结算给服务者。",
+    service_hero_title: "交易之外，也能预约洗护、寄养和接送服务",
+    service_hero_body: "用户下单后进入平台记录，服务完成后再结算给服务者。",
     all_services: "全部服务",
-    doorstep_feeding: "上门投喂",
     grooming: "洗护美容",
     boarding: "寄养看护",
     pickup: "接送交接",
@@ -175,12 +174,11 @@ const i18nLang = {
     submit_booking: "提交预约",
     service_bookings: "服务预约",
     service_acceptance: "服务验收标准",
-    service_check_feed: "投喂后回传食盆、水碗、门窗和排便照片",
     service_check_groom: "洗护服务记录皮肤、耳道和异常情况",
     service_check_pickup: "接送交接必须拍摄运输箱和芯片核对视频",
     service_check_settle: "服务完成后进入平台结算队列",
     no_bookings: "暂无预约",
-    submit_from_services: "从投喂服务页提交一个预约。",
+    submit_from_services: "从服务页提交一个预约。",
     confirm: "确认",
     complete: "完成",
     trade_id: "交易号",
@@ -237,7 +235,7 @@ const i18nLang = {
     t_plus_one_review: "T+1 复核",
     pet_trade: "宠物交易",
     shop_sales: "商品销售",
-    care_services: "投喂服务",
+    care_services: "宠物服务",
     compliance_region: "合规服务",
     transport_region: "运输服务",
     sold: "已售出",
@@ -289,11 +287,9 @@ const i18nLang = {
     review_failed: "审核失败",
     publish_failed: "发布失败",
     welcome_title: "欢迎来到 PetGlobal",
-    welcome_body: "交易、投喂预约、健康档案、售后和监管消息会集中显示在这里。",
+    welcome_body: "交易、服务预约、健康档案、售后和监管消息会集中显示在这里。",
     receive_check_title: "收宠验收提醒",
     receive_check_body: "收宠时请拍完整开箱视频，并核对芯片编号和健康档案。",
-    feeding_title: "上门投喂与饮水巡检",
-    feeding_summary: "按次上门，拍照回传食盆、水碗、排便和门窗状态。",
     grooming_title: "洗护美容到店预约",
     grooming_summary: "洗澡、修毛、耳道护理和基础皮肤检查。",
     boarding_title: "短期寄养与健康看护",
@@ -315,7 +311,7 @@ const i18nLang = {
     demo_pet_name: "团团",
     today_1800: "今天 18:00",
     photo_note: "回传照片",
-    feeding_note: "按平时食量投喂，回传照片",
+    service_note: "请提前说明宠物性格和注意事项",
     detail_overview: "基础信息",
     detail_trade_terms: "交易与结算",
     detail_compliance_docs: "合规资料",
@@ -340,11 +336,11 @@ const i18nLang = {
     merchant_fee_title: "平台抽成清晰透明",
     merchant_pet_fee: "活体宠物：分档抽成 10% / 8% / 6%，每单佣金封顶 $800，跨境合规服务费 $180",
     merchant_shop_fee: "宠物食品、玩具、衣服、用品：每单抽成 12%，运费由订单另计",
-    merchant_service_fee: "投喂、洗护、寄养、接送服务：每单抽成 15%",
+    merchant_service_fee: "洗护、寄养、接送服务：每单抽成 15%",
     merchant_sales_channels: "可招商家类型",
     merchant_type_breeder: "犬舍、猫舍、繁育商",
     merchant_type_supplies: "宠物食品、玩具、衣服、用品品牌",
-    merchant_type_service_provider: "投喂、洗护、寄养、训练服务",
+    merchant_type_service_provider: "洗护、寄养、训练和接送服务",
     merchant_type_logistics: "宠物运输与跨境合规服务",
     merchant_type_clinic: "宠物医院、疫苗和健康证明机构",
     merchant_type_other: "其他宠物相关商家",
@@ -383,7 +379,7 @@ const i18nLang = {
     merchant_message_placeholder: "说明主营品类、资质文件、目标市场或合作需求",
     merchant_expected_pets: "活体宠物",
     merchant_expected_supplies: "宠物食品/玩具/衣服/用品",
-    merchant_expected_services: "投喂/洗护/寄养服务",
+    merchant_expected_services: "洗护/寄养/接送服务",
     merchant_expected_logistics: "运输/进出口合规",
     merchant_expected_multiple: "多品类经营",
     merchant_capacity_1: "1-10 单/月",
@@ -421,7 +417,7 @@ const i18nLang = {
     market_title: "Global Verified Pet Market",
     shop_title: "Pet Food, Toys and Supplies Store",
     merchant_title: "Seller Onboarding and Promotion",
-    services_title: "Feeding, Grooming and Pet Care",
+    services_title: "Grooming, Boarding and Pet Care",
     bookings_title: "Service Bookings and Acceptance",
     transactions_title: "Escrow Trades and Order Flow",
     messages_title: "Platform Message Center",
@@ -516,10 +512,9 @@ const i18nLang = {
     shop_platform_fee: "Product platform commission",
     product_publish_failed: "Failed to list product",
     shop_order_failed: "Failed to create shop order",
-    service_hero_title: "Book feeding, grooming, boarding and pickup beyond pet trades",
-    service_hero_body: "Inspired by the local feeding app: bookings are recorded on-platform and providers settle after completion.",
+    service_hero_title: "Book grooming, boarding and pickup beyond pet trades",
+    service_hero_body: "Bookings are recorded on-platform and providers settle after completion.",
     all_services: "All services",
-    doorstep_feeding: "Doorstep feeding",
     grooming: "Grooming",
     boarding: "Boarding",
     pickup: "Pickup",
@@ -534,7 +529,6 @@ const i18nLang = {
     submit_booking: "Submit booking",
     service_bookings: "Service bookings",
     service_acceptance: "Service acceptance standards",
-    service_check_feed: "Return photos of food bowl, water bowl, doors/windows and waste after feeding",
     service_check_groom: "Record skin, ears and abnormal conditions during grooming",
     service_check_pickup: "Pickup handoff must include carrier and chip-check video",
     service_check_settle: "Completed services enter the platform settlement queue",
@@ -648,11 +642,9 @@ const i18nLang = {
     review_failed: "Review failed",
     publish_failed: "Publish failed",
     welcome_title: "Welcome to PetGlobal",
-    welcome_body: "Trades, feeding bookings, health records, after-sales and regulatory messages appear here.",
+    welcome_body: "Trades, service bookings, health records, after-sales and regulatory messages appear here.",
     receive_check_title: "Pet acceptance reminder",
     receive_check_body: "Record a complete unboxing video and verify the chip number and health file.",
-    feeding_title: "Doorstep Feeding and Water Check",
-    feeding_summary: "Per-visit feeding with photo records for food, water, waste and doors/windows.",
     grooming_title: "Grooming Appointment",
     grooming_summary: "Bathing, trimming, ear care and basic skin checks.",
     boarding_title: "Short-Term Boarding and Health Care",
@@ -674,7 +666,7 @@ const i18nLang = {
     demo_pet_name: "Tuantuan",
     today_1800: "Today 18:00",
     photo_note: "Return photos",
-    feeding_note: "Feed normal portion and return photos",
+    service_note: "Please share pet temperament and special care notes in advance",
     detail_overview: "Overview",
     detail_trade_terms: "Trade and settlement",
     detail_compliance_docs: "Compliance documents",
@@ -699,11 +691,11 @@ const i18nLang = {
     merchant_fee_title: "Transparent platform commission",
     merchant_pet_fee: "Live pets: tiered commission at 10% / 8% / 6%, capped at $800 per order, plus $180 cross-border compliance service fee",
     merchant_shop_fee: "Pet food, toys, clothing, and supplies: 12% commission per order, shipping charged separately",
-    merchant_service_fee: "Feeding, grooming, boarding, and pickup services: 15% commission per booking",
+    merchant_service_fee: "Grooming, boarding, and pickup services: 15% commission per booking",
     merchant_sales_channels: "Merchant categories",
     merchant_type_breeder: "Dog and cat breeders",
     merchant_type_supplies: "Pet food, toy, clothing, and supplies brands",
-    merchant_type_service_provider: "Feeding, grooming, boarding, and training services",
+    merchant_type_service_provider: "Grooming, boarding, training, and pickup services",
     merchant_type_logistics: "Pet transport and cross-border compliance providers",
     merchant_type_clinic: "Clinics, vaccine, and health certificate providers",
     merchant_type_other: "Other pet-related businesses",
@@ -742,7 +734,7 @@ const i18nLang = {
     merchant_message_placeholder: "Describe categories, compliance files, target markets, or partnership needs",
     merchant_expected_pets: "Live pets",
     merchant_expected_supplies: "Pet food / toys / clothing / supplies",
-    merchant_expected_services: "Feeding / grooming / boarding services",
+    merchant_expected_services: "Grooming / boarding / pickup services",
     merchant_expected_logistics: "Transport / import-export compliance",
     merchant_expected_multiple: "Multiple categories",
     merchant_capacity_1: "1-10 orders/month",
@@ -953,18 +945,6 @@ const fallbackListings = [
 
 const fallbackServices = [
   {
-    id: "SV-FEED-001",
-    provider: "Kiwi Hills Kennel",
-    title: "上门投喂与饮水巡检",
-    category: "feeding",
-    summary: "按次上门，拍照回传食盆、水碗、排便和门窗状态。",
-    city: "Shanghai",
-    price: 35,
-    image: "./assets/carecat.png",
-    tags: ["实时记录", "可回放", "2小时响应"],
-    status: "active",
-  },
-  {
     id: "SV-WASH-001",
     provider: "Kiwi Hills Kennel",
     title: "洗护美容到店预约",
@@ -1020,7 +1000,7 @@ const fallbackProducts = [
     seller: "Kiwi Hills Kennel",
     title: "Puzzle treat toy",
     category: "toys",
-    description: "Interactive feeding toy for daily enrichment and slow feeding.",
+    description: "Interactive treat toy for daily enrichment and slower meals.",
     price: 18.99,
     priceCents: 1899,
     stock: 46,
@@ -1072,17 +1052,17 @@ const fallbackShopOrders = [];
 const fallbackBookings = [
   {
     id: "BK-DEMO-001",
-    serviceId: "SV-FEED-001",
-    serviceTitle: "上门投喂与饮水巡检",
+    serviceId: "SV-CARE-001",
+    serviceTitle: "Short-Term Boarding and Health Care",
     buyer: "Demo Buyer",
     provider: "Kiwi Hills Kennel",
-    petName: "团团",
+    petName: "Tuantuan",
     contactPhone: "13800000000",
-    serviceTime: "今天 18:00",
-    note: "回传照片",
-    amount: 35,
-    commission: 3.5,
-    providerPayout: 31.5,
+    serviceTime: "Today 18:00",
+    note: "Please share pet temperament and special care notes in advance",
+    amount: 46,
+    commission: 6.9,
+    providerPayout: 39.1,
     status: "requested",
   },
 ];
@@ -1091,7 +1071,7 @@ const fallbackMessages = [
   {
     id: "MSG-WELCOME",
     title: "欢迎来到 PetGlobal",
-    body: "交易、投喂预约、健康档案、售后和监管消息会集中显示在这里。",
+    body: "交易、服务预约、健康档案、售后和监管消息会集中显示在这里。",
     kind: "system",
     isRead: false,
     createdAt: "2026-06-08",
@@ -1121,10 +1101,10 @@ let state = {
   selectedServiceId: fallbackServices[0].id,
   listings: [...fallbackListings],
   products: [...fallbackProducts],
-  services: [...fallbackServices],
+  services: allowedServices([...fallbackServices]),
   orders: [...fallbackOrders],
   shopOrders: [...fallbackShopOrders],
-  bookings: [...fallbackBookings],
+  bookings: allowedBookings([...fallbackBookings], allowedServices([...fallbackServices])),
   messages: [...fallbackMessages],
   wallet: null,
   apiOnline: false,
@@ -1200,11 +1180,6 @@ const langSwitch = document.querySelector("#langSwitch");
 const langSelect = document.querySelector("#langSelect");
 
 const serviceI18nMap = {
-  "SV-FEED-001": {
-    title: "feeding_title",
-    summary: "feeding_summary",
-    tags: ["real_time_record", "playback", "two_hour_response"],
-  },
   "SV-WASH-001": {
     title: "grooming_title",
     summary: "grooming_summary",
@@ -1331,7 +1306,7 @@ function localizedTime(value) {
 
 function localizedNote(value) {
   if (value === "回传照片" && currentLang === "en") return t("photo_note");
-  if (value === "按平时食量投喂，回传照片" && currentLang === "en") return t("feeding_note");
+  if (value === "Please share pet temperament and special care notes in advance") return t("service_note");
   return value;
 }
 
@@ -1392,9 +1367,22 @@ function filteredProducts() {
 
 function filteredServices() {
   return state.services.filter((service) => {
+    if (service.category === "feeding") return false;
     const matchesFilter = state.serviceFilter === "all" || service.category === state.serviceFilter;
     const haystack = `${serviceTitle(service)} ${serviceSummary(service)} ${serviceTags(service).join(" ")} ${service.title} ${service.summary} ${service.city} ${service.provider}`.toLowerCase();
     return matchesFilter && haystack.includes(state.query.toLowerCase());
+  });
+}
+
+function allowedServices(services = []) {
+  return services.filter((service) => service.category !== "feeding" && service.id !== "SV-FEED-001");
+}
+
+function allowedBookings(bookings = [], services = []) {
+  return bookings.filter((booking) => {
+    if (booking.serviceId === "SV-FEED-001") return false;
+    const service = services.find((item) => item.id === booking.serviceId);
+    return !service || service.category !== "feeding";
   });
 }
 
@@ -1649,7 +1637,7 @@ function showLoginPage() {
 
 function renderAllPageText() {
   document.documentElement.lang = currentLang === "zh" ? "zh-CN" : "en";
-  document.title = currentLang === "zh" ? "PetGlobal Trade - 全球宠物交易与投喂服务" : "PetGlobal Trade - Global Pet Trade and Care";
+  document.title = currentLang === "zh" ? "PetGlobal Trade - 全球宠物交易与宠物服务" : "PetGlobal Trade - Global Pet Trade and Care";
   if (langSwitch) langSwitch.hidden = !i18nConfig.enabled;
   if (langSelect) langSelect.value = currentLang;
 
@@ -1712,7 +1700,6 @@ function renderAllPageText() {
   setText(".service-hero p:not(.eyebrow)", t("service_hero_body"));
   const serviceFilters = [
     ["all", "all_services"],
-    ["feeding", "doorstep_feeding"],
     ["grooming", "grooming"],
     ["boarding", "boarding"],
     ["pickup", "pickup"],
@@ -1726,7 +1713,7 @@ function renderAllPageText() {
   if (bookingPanels[0]) bookingPanels[0].textContent = t("service_bookings");
   if (bookingPanels[1]) bookingPanels[1].textContent = t("service_acceptance");
   const bookingChecks = document.querySelectorAll("#bookingsView .check-list li");
-  ["service_check_feed", "service_check_groom", "service_check_pickup", "service_check_settle"].forEach((key, index) => {
+  ["service_check_groom", "service_check_pickup", "service_check_settle"].forEach((key, index) => {
     const item = bookingChecks[index];
     const icon = item?.querySelector("i");
     if (item) {
@@ -1833,9 +1820,13 @@ function renderAllPageText() {
   }
   if (
     !bookingForm.elements.note.value ||
-    ["按平时食量投喂，回传照片", "Feed normal portion and return photos"].includes(bookingForm.elements.note.value)
+    [
+      "按平时食量投喂，回传照片",
+      "Feed normal portion and return photos",
+      "Please share pet temperament and special care notes in advance",
+    ].includes(bookingForm.elements.note.value)
   ) {
-    bookingForm.elements.note.value = t("feeding_note");
+    bookingForm.elements.note.value = t("service_note");
   }
   bookingForm.querySelector(".primary-action").lastChild.textContent = ` ${t("submit_booking")}`;
 }
@@ -3056,10 +3047,10 @@ async function loadData() {
     ]);
     state.listings = listingData.listings;
     state.products = productData.products;
-    state.services = serviceData.services;
+    state.services = allowedServices(serviceData.services);
     state.orders = orderData.orders;
     state.shopOrders = shopOrderData.orders;
-    state.bookings = bookingData.bookings;
+    state.bookings = allowedBookings(bookingData.bookings, state.services);
     state.messages = messageData.messages.length ? messageData.messages : state.messages;
     state.wallet = walletData.wallet;
     state.apiOnline = true;
