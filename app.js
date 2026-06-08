@@ -1185,12 +1185,17 @@ const petDetailCloseBtn = document.querySelector("#petDetailCloseBtn");
 const newListingBtn = document.querySelector("#newListingBtn");
 const newProductBtn = document.querySelector("#newProductBtn");
 const listingForm = document.querySelector("#listingForm");
+const listingCloseBtn = document.querySelector("#listingCloseBtn");
 const productDialog = document.querySelector("#productDialog");
 const productForm = document.querySelector("#productForm");
+const productCloseBtn = document.querySelector("#productCloseBtn");
 const shopCheckoutDialog = document.querySelector("#shopCheckoutDialog");
 const shopCheckoutForm = document.querySelector("#shopCheckoutForm");
 const shopCheckoutDialogTitle = document.querySelector("#shopCheckoutDialogTitle");
 const shopCheckoutSummary = document.querySelector("#shopCheckoutSummary");
+const shopCheckoutCloseBtn = document.querySelector("#shopCheckoutCloseBtn");
+const bookingCloseBtn = document.querySelector("#bookingCloseBtn");
+const checkoutDialogCloseBtn = document.querySelector("#checkoutDialogCloseBtn");
 const langSwitch = document.querySelector("#langSwitch");
 const langSelect = document.querySelector("#langSelect");
 
@@ -3153,6 +3158,21 @@ roleSelect.addEventListener("change", () => {
 
 openMerchantLandingBtn?.addEventListener("click", showMerchantPublicPage);
 merchantBackToLoginBtn?.addEventListener("click", showLoginPage);
+listingCloseBtn?.addEventListener("click", () => {
+  listingDialog.close();
+});
+productCloseBtn?.addEventListener("click", () => {
+  productDialog.close();
+});
+shopCheckoutCloseBtn?.addEventListener("click", () => {
+  shopCheckoutDialog.close();
+});
+bookingCloseBtn?.addEventListener("click", () => {
+  bookingDialog.close();
+});
+checkoutDialogCloseBtn?.addEventListener("click", () => {
+  checkoutDialog.close();
+});
 petDetailCloseBtn?.addEventListener("click", () => {
   petDetailDialog.close();
 });
