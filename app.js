@@ -1171,9 +1171,13 @@ const bookingDialog = document.querySelector("#bookingDialog");
 const bookingForm = document.querySelector("#bookingForm");
 const bookingDialogTitle = document.querySelector("#bookingDialogTitle");
 const checkoutDialog = document.querySelector("#checkoutDialog");
-const checkoutForm = document.querySelector("#checkoutForm");
+const checkoutForm = document.querySelector("#checkoutPageForm");
 const checkoutDialogTitle = document.querySelector("#checkoutDialogTitle");
-const checkoutSummary = document.querySelector("#checkoutSummary");
+const checkoutSummary = document.querySelector("#checkoutPageSummary");
+const checkoutPageTitle = document.querySelector("#checkoutPageTitle");
+const checkoutBackBtn = document.querySelector("#checkoutBackBtn");
+const checkoutBackText = document.querySelector("#checkoutBackText");
+const checkoutPageImage = document.querySelector("#checkoutPageImage");
 const petDetailDialog = document.querySelector("#petDetailDialog");
 const petDetailDialogTitle = document.querySelector("#petDetailDialogTitle");
 const petDetailContent = document.querySelector("#petDetailContent");
@@ -1779,6 +1783,8 @@ function renderAllPageText() {
   productForm.querySelector(".primary-action").lastChild.textContent = ` ${t("submit_product")}`;
 
   setText("#checkoutDialogTitle", t("checkout_order"));
+  setText("#checkoutPageTitle", t("checkout_order"));
+  setText("#checkoutBackText", currentLang === "zh" ? "\u8fd4\u56de\u5e02\u573a" : "Back to market");
   setText("#petDetailDialogTitle", t("pet_detail"));
   const checkoutLabels = checkoutForm.querySelectorAll("label");
   if (checkoutLabels[0]) checkoutLabels[0].childNodes[0].textContent = `${t("contact_name")} `;
@@ -2112,6 +2118,18 @@ function renderCheckoutSummary(listing) {
   `;
 }
 
+function renderCheckoutPage() {
+  const listing = selectedListing();
+  if (!listing || !checkoutForm) return;
+  checkoutPageTitle.textContent = `${t("checkout_order")} · ${listing.name}`;
+  checkoutForm.elements.listingId.value = listing.id;
+  if (checkoutPageImage) {
+    checkoutPageImage.src = assetUrl(listing.image);
+    checkoutPageImage.alt = `${listing.name} escrow checkout preview`;
+  }
+  renderCheckoutSummary(listing);
+}
+
 function renderShopCheckoutSummary(product) {
   const quantity = Number(shopCheckoutForm.elements.quantity.value || 1);
   const amounts = shopOrderAmounts(product, quantity);
@@ -2127,17 +2145,17 @@ function renderShopCheckoutSummary(product) {
   `;
 }
 
-function openCheckoutDialog(listingId) {
+function openCheckoutPage(listingId) {
   const listing = state.listings.find((item) => item.id === listingId);
   if (!listing) return;
   state.selectedId = listing.id;
-  checkoutDialogTitle.textContent = t("checkout_order");
-  checkoutForm.elements.listingId.value = listing.id;
   checkoutForm.elements.contactName.value = state.user?.displayName || "Demo Buyer";
-  renderCheckoutSummary(listing);
-  if (typeof checkoutDialog.showModal === "function") {
-    checkoutDialog.showModal();
-  }
+  state.view = "checkout";
+  renderCheckoutPage();
+}
+
+function openCheckoutDialog(listingId) {
+  openCheckoutPage(listingId);
 }
 
 function openShopCheckoutDialog(productId) {
@@ -2971,6 +2989,7 @@ function setView(view) {
   navItems.forEach((item) => item.classList.toggle("is-active", item.dataset.view === view));
   const titles = {
     market: "market_title",
+    checkout: "checkout_order",
     shop: "shop_title",
     merchant: "merchant_title",
     services: "services_title",
@@ -2981,7 +3000,7 @@ function setView(view) {
     compliance: "compliance_title",
     revenue: "revenue_title",
   };
-  viewTitle.textContent = t(titles[view]);
+  viewTitle.textContent = t(titles[view] || "market_title");
 }
 
 function render() {
@@ -3001,6 +3020,7 @@ function render() {
     button.classList.toggle("is-active", button.dataset.serviceFilter === state.serviceFilter);
   });
   if (state.authed) setView(state.view);
+  if (state.view === "checkout") renderCheckoutPage();
   renderMetrics();
   renderListings();
   renderShop();
@@ -3202,6 +3222,11 @@ navItems.forEach((item) => {
   });
 });
 
+checkoutBackBtn?.addEventListener("click", () => {
+  state.view = "market";
+  render();
+});
+
 [calcPrice, calcRate, calcService].forEach((input) => {
   input.addEventListener("input", renderCalculator);
 });
@@ -3295,7 +3320,6 @@ checkoutForm.addEventListener("submit", async (event) => {
     buyerNote: data.get("buyerNote"),
     kycConfirmed: data.get("kycConfirmed") === "on",
   });
-  checkoutDialog.close();
   render();
 });
 

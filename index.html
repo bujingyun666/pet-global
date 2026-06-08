@@ -219,6 +219,83 @@
           </div>
         </section>
 
+        <section class="view-panel is-hidden" id="checkoutView">
+          <div class="checkout-page">
+            <header class="checkout-page-header">
+              <button class="secondary-action" id="checkoutBackBtn" type="button">
+                <i data-lucide="arrow-left" aria-hidden="true"></i>
+                <span id="checkoutBackText">Back to market</span>
+              </button>
+              <div>
+                <p class="eyebrow">ESCROW CHECKOUT</p>
+                <h3 id="checkoutPageTitle">Submit escrow order</h3>
+              </div>
+            </header>
+
+            <div class="checkout-page-layout">
+              <aside class="checkout-page-summary-card">
+                <img id="checkoutPageImage" src="./assets/hero.png" alt="Pet escrow checkout preview" />
+                <div class="checkout-summary" id="checkoutPageSummary"></div>
+              </aside>
+
+              <form class="checkout-page-form" id="checkoutPageForm">
+                <input name="listingId" type="hidden" />
+                <div class="form-grid two-cols">
+                  <label>
+                    Contact name
+                    <input name="contactName" value="Demo Buyer" required />
+                  </label>
+                  <label>
+                    Contact phone
+                    <input name="contactPhone" value="+1 555 0188" required />
+                  </label>
+                  <label>
+                    Destination country
+                    <input name="destinationCountry" value="United States" required />
+                  </label>
+                  <label>
+                    Destination city
+                    <input name="destinationCity" value="Los Angeles" required />
+                  </label>
+                </div>
+                <label>
+                  Full address
+                  <input name="deliveryAddress" value="1200 Petcare Ave, Los Angeles, CA" required />
+                </label>
+                <div class="form-grid two-cols">
+                  <label>
+                    Import documents
+                    <select name="importPermit">
+                      <option value="buyer_confirmed">Buyer confirmed import documents</option>
+                      <option value="need_platform_help">Need platform help</option>
+                    </select>
+                  </label>
+                  <label>
+                    Transport option
+                    <select name="transportOption">
+                      <option value="platform_partner">Platform logistics partner</option>
+                      <option value="seller_arranged">Seller-arranged transport</option>
+                      <option value="buyer_arranged">Buyer pickup / arranged</option>
+                    </select>
+                  </label>
+                </div>
+                <label>
+                  Order note
+                  <input name="buyerNote" value="Please share chip and vaccine files before shipping." />
+                </label>
+                <label class="check-field">
+                  <input name="kycConfirmed" type="checkbox" checked required />
+                  <span>I confirm buyer identity, import rules, acceptance checks and escrow terms</span>
+                </label>
+                <button class="primary-action" value="default" type="submit">
+                  <i data-lucide="shield-check" aria-hidden="true"></i>
+                  Submit escrow order
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
         <section class="view-panel is-hidden" id="shopView">
           <div class="filters-row" aria-label="Shop filters">
             <button class="filter-pill is-active" data-shop-filter="all">全部商品</button>

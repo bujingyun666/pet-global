@@ -1297,6 +1297,86 @@ dialog::backdrop {
   background: rgba(255, 255, 255, 0.96);
 }
 
+.checkout-page {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.checkout-page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.checkout-page-header h3 {
+  margin-bottom: 0;
+  font-size: clamp(22px, 3vw, 32px);
+}
+
+.checkout-page-header > div {
+  min-width: 0;
+}
+
+.checkout-page-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.76fr) minmax(0, 1.24fr);
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+
+.checkout-page-summary-card,
+.checkout-page-form {
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+
+.checkout-page-summary-card {
+  position: sticky;
+  top: 18px;
+  overflow: hidden;
+}
+
+.checkout-page-summary-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 11;
+  object-fit: cover;
+  background: var(--subtle);
+}
+
+.checkout-page-summary-card .checkout-summary {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  padding: 14px;
+}
+
+.checkout-page-form {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.checkout-page-form input,
+.checkout-page-form select {
+  min-width: 0;
+}
+
+.checkout-page-form .check-field {
+  margin: 0;
+}
+
+.checkout-page-form .primary-action {
+  min-height: 52px;
+  width: 100%;
+}
+
 .checkout-form {
   width: 100%;
   max-width: none;
@@ -1552,6 +1632,22 @@ dialog::backdrop {
     padding: 12px 16px;
   }
 
+  .checkout-page-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .checkout-page-summary-card {
+    position: static;
+  }
+
+  .checkout-page-summary-card img {
+    aspect-ratio: 16 / 8;
+  }
+
+  .checkout-page-form {
+    padding: 16px;
+  }
+
   .checkout-form {
     max-height: calc(100vh - 20px);
   }
@@ -1690,6 +1786,15 @@ dialog::backdrop {
   .detail-grid,
   .payout-item {
     grid-template-columns: 1fr;
+  }
+
+  .checkout-page-header {
+    display: grid;
+    align-items: start;
+  }
+
+  .checkout-page-header .secondary-action {
+    justify-self: start;
   }
 
   .checkout-form > .form-grid.two-cols {
