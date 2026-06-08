@@ -43,6 +43,26 @@ Seller wallet now includes:
 - Seller Stripe Connect onboarding for real payout destinations.
 - Admin payout review actions for marking requests as paid or rejected. When Stripe is configured, Stripe Connect requests can create real Stripe transfers.
 
+## Seller Listing Compliance Flow
+
+Seller publishing now collects the materials needed for a real pet marketplace review:
+
+- Pet image upload.
+- Vaccine record, microchip certificate, health certificate, and optional export/import permit upload.
+- Microchip number.
+- Seller legal name, ID type, and masked ID reference.
+- Export country, import country, and transport route.
+- Admin compliance queue shows the identity summary, country route, microchip ID, and file links before approving or restricting a listing.
+
+Uploads are stored under `UPLOAD_DIR`. On Render, use the persistent disk path:
+
+```bash
+UPLOAD_DIR=/opt/render/project/src/data/uploads
+DATABASE_PATH=/opt/render/project/src/data/petglobal.sqlite
+```
+
+For long-term production, move uploads to object storage such as S3, Cloudflare R2, or another private file store with signed access URLs.
+
 ## Multilingual Settings
 
 The frontend auto-detects browser language, supports manual Chinese/English switching, and persists the choice in `localStorage` as `petopia_lang`. API calls send `Accept-Language` so backend errors, service names, bookings, wallet rows, and platform messages can return the matching language.

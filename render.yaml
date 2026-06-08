@@ -16,7 +16,9 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: DATABASE_PATH
-        value: ./data/petglobal.sqlite
+        value: /opt/render/project/src/data/petglobal.sqlite
+      - key: UPLOAD_DIR
+        value: /opt/render/project/src/data/uploads
       - key: COMMISSION_RATE
         value: "0.08"
       - key: MOCK_PAYMENT_MODE

@@ -9,7 +9,8 @@ COPY . .
 
 ENV NODE_ENV=production
 ENV PORT=4174
-ENV DATABASE_PATH=./data/petglobal.sqlite
+ENV DATABASE_PATH=/opt/render/project/src/data/petglobal.sqlite
+ENV UPLOAD_DIR=/opt/render/project/src/data/uploads
 
 EXPOSE 4174
 

@@ -17,6 +17,11 @@ function apiUrl(path) {
   return `${apiBaseUrl}${path}`;
 }
 
+function assetUrl(url) {
+  if (!url || /^https?:\/\//i.test(url) || url.startsWith("/assets/")) return url;
+  return apiUrl(url);
+}
+
 const i18nLang = {
   zh: {
     email: "邮箱",
@@ -142,6 +147,15 @@ const i18nLang = {
     risk_queue: "风险队列",
     compliance_seller: "卖家身份、繁育许可、历史评价",
     compliance_docs: "微芯片编号、疫苗记录、健康证明",
+    compliance_files: "证明文件",
+    seller_identity: "卖家实名",
+    microchip_id: "芯片编号",
+    export_country: "出口国家",
+    import_country: "进口国家",
+    vaccine_record: "疫苗记录",
+    chip_certificate: "芯片证明",
+    health_certificate: "健康证明",
+    export_permit: "出口/进口许可",
     compliance_country: "买卖双方国家进口/出口规则",
     compliance_transport: "运输商资质、航线、福利检查点",
     fee_calculator: "手续费计算",
@@ -362,6 +376,15 @@ const i18nLang = {
     risk_queue: "Risk queue",
     compliance_seller: "Seller identity, breeding permit and historical reviews",
     compliance_docs: "Microchip ID, vaccine records and health certificate",
+    compliance_files: "Compliance files",
+    seller_identity: "Seller identity",
+    microchip_id: "Microchip ID",
+    export_country: "Export country",
+    import_country: "Import country",
+    vaccine_record: "Vaccine record",
+    chip_certificate: "Chip certificate",
+    health_certificate: "Health certificate",
+    export_permit: "Export/import permit",
     compliance_country: "Buyer/seller import and export rules by country",
     compliance_transport: "Transport provider, route and welfare checkpoints",
     fee_calculator: "Fee calculator",
@@ -848,11 +871,12 @@ function money(value, currency = state.currency) {
 }
 
 async function apiFetch(path, options = {}) {
+  const isFormData = options.body instanceof FormData;
   const headers = {
-    "Content-Type": "application/json",
     "Accept-Language": currentLang,
     ...(options.headers || {}),
   };
+  if (!isFormData) headers["Content-Type"] = "application/json";
   if (state.token) headers.Authorization = `Bearer ${state.token}`;
   const response = await fetch(apiUrl(path), {
     ...options,
@@ -1030,7 +1054,8 @@ function renderAllPageText() {
   if (listingLabels[0]) listingLabels[0].childNodes[0].textContent = `${t("pet_name")} `;
   if (listingLabels[1]) listingLabels[1].childNodes[0].textContent = `${t("breed")} `;
   if (listingLabels[2]) listingLabels[2].childNodes[0].textContent = `${t("country")} `;
-  if (listingLabels[3]) listingLabels[3].childNodes[0].textContent = `${t("price_usd")} `;
+  const priceLabel = listingForm.querySelector('input[name="price"]')?.closest("label");
+  if (priceLabel) priceLabel.childNodes[0].textContent = `${t("price_usd")} `;
   listingForm.querySelector(".primary-action").lastChild.textContent = ` ${t("submit_review")}`;
 
   setText("#checkoutDialogTitle", t("checkout_order"));
@@ -1091,7 +1116,7 @@ function renderListings() {
       const canBuy = listing.status === "approved" && state.user?.role !== "seller";
       return `
         <article class="listing-card ${listing.id === state.selectedId ? "is-selected" : ""}">
-          <img src="${listing.image}" alt="${listing.breed} listing from ${listing.country}" />
+          <img src="${assetUrl(listing.image)}" alt="${listing.breed} listing from ${listing.country}" />
           <div class="listing-body">
             <div class="listing-head">
               <div>
@@ -1255,6 +1280,19 @@ async function updateBookingStatus(bookingId, status) {
     state.bookings = state.bookings.map((booking) => (booking.id === bookingId ? { ...booking, status } : booking));
   }
   render();
+}
+
+async function uploadListingFiles(formData) {
+  const files = new FormData();
+  ["petImage", "vaccineFile", "chipFile", "healthCertFile", "exportPermitFile"].forEach((name) => {
+    const file = formData.get(name);
+    if (file && file.size) files.append(name, file);
+  });
+  if (![...files.keys()].length) return { files: {} };
+  return apiFetch("/api/uploads/listing-files", {
+    method: "POST",
+    body: files,
+  });
 }
 
 async function createEscrowIntent(listing) {
@@ -1453,7 +1491,7 @@ function renderDealPanel() {
   const sellerPayout = Number((listing.price - listing.price * 0.015).toFixed(2));
   const canBuy = listing.status === "approved" && state.user?.role !== "seller";
   dealPanel.innerHTML = `
-    <img src="${listing.image}" alt="${listing.name} transaction preview" />
+    <img src="${assetUrl(listing.image)}" alt="${listing.name} transaction preview" />
     <div class="deal-body">
       <h3>${listing.name} · ${listing.breed}</h3>
       <p>${listing.route}</p>
@@ -1712,10 +1750,24 @@ function renderCompliance() {
   const risks = state.listings.filter((listing) => listing.risk !== "low" || listing.status === "review");
   riskQueue.innerHTML = risks
     .map(
-      (listing) => `
+      (listing) => {
+        const files = listing.files || {};
+        const fileLinks = [
+          ["vaccineFile", "vaccine_record"],
+          ["chipFile", "chip_certificate"],
+          ["healthCertFile", "health_certificate"],
+          ["exportPermitFile", "export_permit"],
+        ]
+          .filter(([key]) => files[key])
+          .map(([key, label]) => `<a href="${assetUrl(files[key])}" target="_blank" rel="noreferrer">${t(label)}</a>`)
+          .join(" · ");
+        return `
         <div class="risk-item">
           <strong>${listing.id} · ${listing.name}</strong>
           <span>${listing.country} · ${listing.docs.join(", ")}</span>
+          <span>${t("seller_identity")}: ${listing.sellerLegalName || listing.seller || "-"} · ${listing.sellerIdType || "-"} ${listing.sellerIdLast4 ? `****${listing.sellerIdLast4}` : ""}</span>
+          <span>${t("microchip_id")}: ${listing.microchipId || "-"} · ${t("export_country")}: ${listing.exportCountry || "-"} · ${t("import_country")}: ${listing.importCountry || "-"}</span>
+          <span>${t("compliance_files")}: ${fileLinks || "-"}</span>
           <span class="status review">${t("review_required")}</span>
           ${
             state.user?.role === "admin"
@@ -1726,7 +1778,8 @@ function renderCompliance() {
               : ""
           }
         </div>
-      `,
+      `;
+      },
     )
     .join("");
 
@@ -1979,18 +2032,30 @@ listingForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const data = new FormData(listingForm);
   try {
+    const uploadResult = await uploadListingFiles(data);
+    const uploaded = uploadResult.files || {};
     const response = await apiFetch("/api/listings", {
       method: "POST",
       body: JSON.stringify({
         name: data.get("name"),
         species: "Dog",
         breed: data.get("breed"),
-        age: "Pending",
+        age: data.get("age") || "Pending",
         country: data.get("country"),
+        exportCountry: data.get("exportCountry") || data.get("country"),
+        importCountry: data.get("importCountry") || "",
+        microchipId: data.get("microchipId") || "",
+        sellerLegalName: data.get("sellerLegalName") || state.user?.displayName || "",
+        sellerIdType: data.get("sellerIdType") || "passport",
+        sellerIdLast4: data.get("sellerIdLast4") || "",
         price: Number(data.get("price")),
-        image: "/assets/dog.jpg",
+        image: uploaded.petImage?.url || "/assets/dog.jpg",
+        vaccineFileUrl: uploaded.vaccineFile?.url || "",
+        chipFileUrl: uploaded.chipFile?.url || "",
+        healthCertFileUrl: uploaded.healthCertFile?.url || "",
+        exportPermitFileUrl: uploaded.exportPermitFile?.url || "",
         docs: ["Seller ID"],
-        route: "Pending route",
+        route: data.get("route") || "Pending route",
       }),
     });
     state.listings.unshift(response.listing);

@@ -191,6 +191,15 @@ function runMigrations() {
   ensureColumn("orders", "protection_days", "INTEGER NOT NULL DEFAULT 7");
   ensureColumn("orders", "checkout_session_id", "TEXT");
   ensureColumn("payout_requests", "provider_transfer_id", "TEXT");
+  ensureColumn("listings", "export_country", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn("listings", "import_country", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn("listings", "microchip_id", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn("listings", "seller_legal_name", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn("listings", "seller_id_type", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn("listings", "seller_id_last4", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn("listings", "files_json", "TEXT NOT NULL DEFAULT '{}'");
+  ensureColumn("listings", "review_note", "TEXT NOT NULL DEFAULT ''");
+  ensureColumn("listings", "compliance_status", "TEXT NOT NULL DEFAULT 'pending'");
 
   db.prepare(`
     UPDATE orders
@@ -424,6 +433,15 @@ export function toListing(row) {
     image: row.image,
     docs: JSON.parse(row.docs_json),
     route: row.route,
+    exportCountry: row.export_country || row.country,
+    importCountry: row.import_country || "",
+    microchipId: row.microchip_id || "",
+    sellerLegalName: row.seller_legal_name || "",
+    sellerIdType: row.seller_id_type || "",
+    sellerIdLast4: row.seller_id_last4 || "",
+    files: JSON.parse(row.files_json || "{}"),
+    reviewNote: row.review_note || "",
+    complianceStatus: row.compliance_status || "pending",
     status: row.status,
     risk: row.risk,
   };

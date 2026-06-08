@@ -301,7 +301,7 @@
     </div>
 
     <dialog id="listingDialog">
-      <form method="dialog" class="dialog-panel" id="listingForm">
+      <form method="dialog" class="dialog-panel" id="listingForm" enctype="multipart/form-data">
         <header>
           <h3>发布宠物</h3>
           <button class="ghost-icon" value="cancel" type="submit" aria-label="关闭" title="关闭">
@@ -319,6 +319,70 @@
         <label>
           国家
           <input name="country" value="Canada" required />
+        </label>
+        <div class="form-grid two-cols">
+          <label>
+            年龄
+            <input name="age" value="12 months" required />
+          </label>
+          <label>
+            芯片编号
+            <input name="microchipId" value="985141000000001" required />
+          </label>
+        </div>
+        <div class="form-grid two-cols">
+          <label>
+            出口国家
+            <input name="exportCountry" value="Canada" required />
+          </label>
+          <label>
+            进口国家
+            <input name="importCountry" value="United States" required />
+          </label>
+        </div>
+        <label>
+          宠物图片
+          <input name="petImage" type="file" accept="image/png,image/jpeg,image/webp" required />
+        </label>
+        <div class="form-grid two-cols">
+          <label>
+            疫苗记录
+            <input name="vaccineFile" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" required />
+          </label>
+          <label>
+            芯片证明
+            <input name="chipFile" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" required />
+          </label>
+          <label>
+            健康证明
+            <input name="healthCertFile" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" required />
+          </label>
+          <label>
+            出口/进口许可
+            <input name="exportPermitFile" type="file" accept="image/png,image/jpeg,image/webp,application/pdf" />
+          </label>
+        </div>
+        <div class="form-grid two-cols">
+          <label>
+            卖家实名
+            <input name="sellerLegalName" value="Kiwi Hills Kennel Ltd" required />
+          </label>
+          <label>
+            证件类型
+            <select name="sellerIdType">
+              <option value="passport">Passport</option>
+              <option value="national_id">National ID</option>
+              <option value="business_license">Business license</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          证件后四位
+          <input name="sellerIdLast4" value="8899" required />
+        </label>
+        <label>
+          运输路线
+          <input name="route" value="Toronto -> New York" required />
         </label>
         <label>
           价格 USD

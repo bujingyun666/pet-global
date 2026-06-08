@@ -1,7 +1,9 @@
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 import express from "express";
+import fs from "node:fs";
 import morgan from "morgan";
+import multer from "multer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { nanoid } from "nanoid";
@@ -32,6 +34,8 @@ initializeDatabase();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
+const uploadRoot = path.resolve(projectRoot, process.env.UPLOAD_DIR || "./data/uploads");
+fs.mkdirSync(uploadRoot, { recursive: true });
 const app = express();
 const port = Number(process.env.PORT || 4174);
 const commissionRate = Number(process.env.COMMISSION_RATE || 0.08);
@@ -58,6 +62,34 @@ const allowedOrigins = new Set(
     ...(process.env.ALLOWED_ORIGINS || "").split(",").map((item) => item.trim()).filter(Boolean),
   ],
 );
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (_req, file, cb) => {
+      const type = file.fieldname === "petImage" ? "images" : "documents";
+      const dir = path.join(uploadRoot, type);
+      fs.mkdirSync(dir, { recursive: true });
+      cb(null, dir);
+    },
+    filename: (_req, file, cb) => {
+      const extension = path.extname(file.originalname || "").toLowerCase() || ".bin";
+      cb(null, `${Date.now()}-${nanoid(10)}${extension}`);
+    },
+  }),
+  limits: {
+    fileSize: 8 * 1024 * 1024,
+    files: 6,
+  },
+  fileFilter: (_req, file, cb) => {
+    const allowedTypes = new Set([
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "application/pdf",
+    ]);
+    cb(null, allowedTypes.has(file.mimetype));
+  },
+});
 
 const apiText = {
   zh: {
@@ -259,6 +291,7 @@ app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), (req,
 });
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
+app.use("/uploads", express.static(uploadRoot));
 app.use(express.static(projectRoot, { extensions: ["html"] }));
 
 const registerSchema = z.object({
@@ -280,6 +313,16 @@ const listingSchema = z.object({
   breed: z.string().min(2).max(80),
   age: z.string().min(2).max(40),
   country: z.string().min(2).max(80),
+  exportCountry: z.string().min(2).max(80).optional().default(""),
+  importCountry: z.string().min(2).max(80).optional().default(""),
+  microchipId: z.string().min(4).max(80).optional().default(""),
+  sellerLegalName: z.string().min(2).max(100),
+  sellerIdType: z.enum(["passport", "national_id", "business_license"]).default("passport"),
+  sellerIdLast4: z.string().min(2).max(12),
+  vaccineFileUrl: z.string().max(240).optional().default(""),
+  chipFileUrl: z.string().max(240).optional().default(""),
+  healthCertFileUrl: z.string().max(240).optional().default(""),
+  exportPermitFileUrl: z.string().max(240).optional().default(""),
   price: z.number().positive().max(1000000),
   image: z.string().default("/assets/dog.jpg"),
   docs: z.array(z.string().min(2).max(80)).default(["Seller ID"]),
@@ -425,6 +468,7 @@ function getListingRows({ status, search } = {}) {
   }
   if (search) {
     clauses.push(`(
+      lower(l.id) LIKE @search OR
       lower(l.name) LIKE @search OR
       lower(l.breed) LIKE @search OR
       lower(l.country) LIKE @search OR
@@ -731,17 +775,62 @@ app.patch("/api/service-bookings/:id/status", requireAuth, requireRole("seller",
   res.json({ booking: localizeBooking(toBooking(row), req) });
 });
 
+app.post(
+  "/api/uploads/listing-files",
+  requireAuth,
+  requireRole("seller", "admin"),
+  upload.fields([
+    { name: "petImage", maxCount: 1 },
+    { name: "vaccineFile", maxCount: 1 },
+    { name: "chipFile", maxCount: 1 },
+    { name: "healthCertFile", maxCount: 1 },
+    { name: "exportPermitFile", maxCount: 1 },
+  ]),
+  (req, res) => {
+    const files = Object.fromEntries(
+      Object.entries(req.files || {}).map(([key, items]) => [
+        key,
+        {
+          originalName: items[0].originalname,
+          mimeType: items[0].mimetype,
+          size: items[0].size,
+          url: `/uploads/${items[0].fieldname === "petImage" ? "images" : "documents"}/${items[0].filename}`,
+        },
+      ]),
+    );
+    res.status(201).json({ files });
+  },
+);
+
 app.post("/api/listings", requireAuth, requireRole("seller", "admin"), (req, res) => {
   const parsed = listingSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json(validationError(req, parsed.error));
 
   const id = `PG-${nanoid(8).toUpperCase()}`;
+  const files = {
+    vaccineFile: parsed.data.vaccineFileUrl,
+    chipFile: parsed.data.chipFileUrl,
+    healthCertFile: parsed.data.healthCertFileUrl,
+    exportPermitFile: parsed.data.exportPermitFileUrl,
+  };
+  const docs = [
+    ...new Set([
+      ...parsed.data.docs,
+      parsed.data.microchipId ? "Microchip" : "",
+      parsed.data.vaccineFileUrl ? "Vaccine record" : "",
+      parsed.data.healthCertFileUrl ? "Health certificate" : "",
+      parsed.data.exportPermitFileUrl ? "Export permit" : "",
+      parsed.data.sellerLegalName ? "Seller KYC" : "",
+    ].filter(Boolean)),
+  ];
   db.prepare(`
     INSERT INTO listings (
       id, seller_id, name, species, breed, age, country, price_cents, currency,
-      image, docs_json, route, status, risk
+      image, docs_json, route, status, risk, export_country, import_country,
+      microchip_id, seller_legal_name, seller_id_type, seller_id_last4,
+      files_json, compliance_status
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'USD', ?, ?, ?, 'review', 'medium')
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'USD', ?, ?, ?, 'review', 'medium', ?, ?, ?, ?, ?, ?, ?, 'pending')
   `).run(
     id,
     req.user.id,
@@ -752,8 +841,15 @@ app.post("/api/listings", requireAuth, requireRole("seller", "admin"), (req, res
     parsed.data.country,
     centsFromPrice(parsed.data.price),
     parsed.data.image,
-    JSON.stringify(parsed.data.docs),
+    JSON.stringify(docs),
     parsed.data.route,
+    parsed.data.exportCountry || parsed.data.country,
+    parsed.data.importCountry,
+    parsed.data.microchipId,
+    parsed.data.sellerLegalName,
+    parsed.data.sellerIdType,
+    parsed.data.sellerIdLast4,
+    JSON.stringify(files),
   );
 
   const row = getListingRows({ search: id })[0];
