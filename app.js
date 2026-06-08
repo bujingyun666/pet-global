@@ -87,6 +87,11 @@ const i18nLang = {
     expected_seller_payout: "预计卖家入账",
     backend_calculates: "价格、手续费和托管状态由后台重新计算并保存。",
     confirm_payment: "确认付款",
+    continue_payment: "继续付款",
+    stripe_connect_setup: "连接 Stripe 收款",
+    stripe_connect_country: "Stripe 国家代码",
+    stripe_connect_hint: "完成 Stripe Connect 后，平台可把已释放订单款打给卖家。",
+    stripe_connect_failed: "Stripe 收款账户连接失败",
     no_transactions: "暂无交易。",
     service_hero_title: "交易之外，也能预约投喂、洗护、寄养和接送",
     service_hero_body: "参考宠投喂 App 的服务入口：用户下单后进入平台记录，服务完成后再结算给服务者。",
@@ -302,6 +307,11 @@ const i18nLang = {
     expected_seller_payout: "Expected seller payout",
     backend_calculates: "Prices, fees and escrow states are recalculated and stored by the backend.",
     confirm_payment: "Confirm payment",
+    continue_payment: "Continue payment",
+    stripe_connect_setup: "Connect Stripe payouts",
+    stripe_connect_country: "Stripe country code",
+    stripe_connect_hint: "After Stripe Connect onboarding, released order funds can be transferred to the seller.",
+    stripe_connect_failed: "Stripe payout setup failed",
     no_transactions: "No trades yet.",
     service_hero_title: "Book feeding, grooming, boarding and pickup beyond pet trades",
     service_hero_body: "Inspired by the local feeding app: bookings are recorded on-platform and providers settle after completion.",
@@ -1263,6 +1273,9 @@ async function submitCheckout(payload) {
       item.id === payload.listingId ? { ...item, status: "sold" } : item,
     );
     state.view = "transactions";
+    if (data.payment?.checkoutUrl) {
+      window.location.assign(data.payment.checkoutUrl);
+    }
   } catch (error) {
     if (state.apiOnline) {
       alert(`${t("trade_create_failed")}: ${error.message}`);
@@ -1298,12 +1311,18 @@ async function submitCheckout(payload) {
   }
 }
 
-async function confirmMockPayment(orderId) {
+async function continuePayment(orderId) {
   try {
-    const data = await apiFetch(`/api/orders/${orderId}/mock-confirm-payment`, {
+    const data = await apiFetch(`/api/orders/${orderId}/pay`, {
       method: "POST",
     });
-    state.orders = state.orders.map((order) => (order.id === orderId ? data.order : order));
+    if (data.payment?.checkoutUrl) {
+      window.location.assign(data.payment.checkoutUrl);
+      return;
+    }
+    if (data.order) {
+      state.orders = state.orders.map((order) => (order.id === orderId ? data.order : order));
+    }
     render();
   } catch (error) {
     state.orders = state.orders.map((order) =>
@@ -1409,6 +1428,24 @@ async function updatePayoutStatus(payoutId, status) {
   renderWallet();
 }
 
+async function startStripeConnect(event) {
+  event.preventDefault();
+  const form = new FormData(event.currentTarget);
+  try {
+    const data = await apiFetch("/api/seller/stripe-connect", {
+      method: "POST",
+      body: JSON.stringify({
+        country: String(form.get("country") || "US").toUpperCase(),
+      }),
+    });
+    if (data.onboardingUrl) {
+      window.location.assign(data.onboardingUrl);
+    }
+  } catch (error) {
+    alert(`${t("stripe_connect_failed")}: ${error.message}`);
+  }
+}
+
 function renderDealPanel() {
   const listing = selectedListing();
   if (!listing) return;
@@ -1457,7 +1494,7 @@ function renderTransactions() {
           <td>${money(tx.fee || 0)}</td>
           <td>
             <span class="status ${String(tx.status).includes("pending") ? "review" : "approved"}">${statusLabel(tx.status)}</span>
-            ${pending ? `<button class="secondary-action" type="button" data-confirm="${tx.id}">${t("confirm_payment")}</button>` : ""}
+            ${pending ? `<button class="secondary-action" type="button" data-confirm="${tx.id}">${t("continue_payment")}</button>` : ""}
             <button class="secondary-action" type="button" data-order-detail="${tx.id}">${t("order_detail")}</button>
             ${nextButton}
           </td>
@@ -1485,7 +1522,7 @@ function renderTransactions() {
   }
 
   transactionBody.querySelectorAll("[data-confirm]").forEach((button) => {
-    button.addEventListener("click", () => confirmMockPayment(button.dataset.confirm));
+    button.addEventListener("click", () => continuePayment(button.dataset.confirm));
   });
   transactionBody.querySelectorAll("[data-advance]").forEach((button) => {
     button.addEventListener("click", () => advanceOrder(button.dataset.advance, button.dataset.status));
@@ -1596,6 +1633,19 @@ function renderWallet() {
       <div><span>${t("settled_amount")}</span><strong>${money(wallet.settled || 0)}</strong></div>
       <div><span>${t("settlement_rule")}</span><strong>${t("t_plus_one_review")}</strong></div>
     </div>
+    ${
+      state.user?.role === "seller"
+        ? `<form class="payout-form" id="stripeConnectForm">
+            <strong>${t("stripe_connect_setup")}</strong>
+            <p>${t("stripe_connect_hint")}</p>
+            <label>${t("stripe_connect_country")}<input name="country" maxlength="2" value="US" required /></label>
+            <button class="secondary-action" type="submit">
+              <i data-lucide="link" aria-hidden="true"></i>
+              ${t("stripe_connect_setup")}
+            </button>
+          </form>`
+        : ""
+    }
     <form class="payout-form" id="payoutForm">
       <strong>${t("request_payout")}</strong>
       <div class="form-grid two-cols">
@@ -1638,6 +1688,7 @@ function renderWallet() {
         : `<span>${t("no_payouts")}</span>`}
     </div>
   `;
+  walletSummary.querySelector("#stripeConnectForm")?.addEventListener("submit", startStripeConnect);
   walletRows.innerHTML = (wallet.items || [])
     .map(
       (item) => `
@@ -1791,6 +1842,16 @@ async function loadData() {
   } catch (error) {
     console.warn("Using fallback data:", error.message);
     state.apiOnline = false;
+  }
+}
+
+function applyReturnParams() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("payment") === "stripe_success" || params.get("payment") === "stripe_cancelled") {
+    state.view = "transactions";
+  }
+  if (params.has("payment") || params.has("stripe_connect")) {
+    window.history.replaceState({}, "", window.location.pathname);
   }
 }
 
@@ -1979,6 +2040,7 @@ checkoutForm.addEventListener("submit", async (event) => {
 
 window.addEventListener("load", async () => {
   await loadRuntimeConfig();
+  applyReturnParams();
   if (window.lucide) window.lucide.createIcons();
   render();
   if (!state.token) return;

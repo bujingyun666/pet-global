@@ -28,7 +28,8 @@ The buyer flow is now a fuller escrow-style demo:
 - Buyer enters contact, phone, destination country/city, full address, import document status, transport option, order note, and KYC/terms confirmation.
 - Backend recalculates pet price, platform commission, compliance/service fee, seller payout, and total due. The frontend total is never trusted.
 - Backend creates the order and locks the pet listing as `sold` in one transaction to prevent duplicate purchase.
-- Mock payment confirmation moves the order from `payment_pending` to `escrow_funded`.
+- In demo mode, mock payment confirmation moves the order from `payment_pending` to `escrow_funded`.
+- In Stripe mode, the backend creates a Stripe Checkout Session and the verified webhook moves the order into escrow after payment succeeds.
 - Admin can advance documents, transport, delivery, release, dispute, or cancellation. Cancellation releases the locked pet back to approved inventory.
 - Transaction rows expose order details for contact, destination, address, import status, transport, and protection period.
 
@@ -39,7 +40,8 @@ Seller wallet now includes:
 - Pending settlement from escrow-funded pet trades and confirmed/completed services.
 - Available withdrawal balance from released pet trades and settled service bookings.
 - Seller withdrawal requests with bank, PayPal, or Stripe Connect fields.
-- Admin payout review actions for marking requests as paid or rejected.
+- Seller Stripe Connect onboarding for real payout destinations.
+- Admin payout review actions for marking requests as paid or rejected. When Stripe is configured, Stripe Connect requests can create real Stripe transfers.
 
 ## Multilingual Settings
 
@@ -79,6 +81,8 @@ vercel deploy --prod --yes
 
 After that, `https://pet-global-mocha.vercel.app` will call the real backend for login, inventory lock, escrow orders, wallet, and payout review.
 
+Current note: `https://pet-global-api.onrender.com/api/health` was checked and returned 404, so the Render backend URL is not confirmed yet. Copy the real `.onrender.com` service URL from Render after deployment, then put it into `config.js`.
+
 ## Render Backend Deployment
 
 This repo includes `render.yaml`. On Render:
@@ -92,11 +96,54 @@ This repo includes `render.yaml`. On Render:
 - `DATABASE_PATH=./data/petglobal.sqlite`
 - `COMMISSION_RATE=0.08`
 - `MOCK_PAYMENT_MODE=true`
+- `PUBLIC_APP_URL=https://pet-global-mocha.vercel.app`
+- `BACKEND_BASE_URL=https://YOUR-RENDER-BACKEND.onrender.com`
 - `I18N_ENABLED=true`
 - `I18N_DEFAULT_LANG=en`
 - `ALLOWED_ORIGINS=https://pet-global-mocha.vercel.app`
 
 Render will give you a backend URL like `https://pet-global-api.onrender.com`. Put that URL into `config.js` as `apiBaseUrl`.
+
+## Stripe Production Payments
+
+The backend now supports both safe demo payments and real Stripe payments.
+
+Keep demo mode while testing:
+
+```bash
+MOCK_PAYMENT_MODE=true
+```
+
+To enable real Stripe Checkout and Connect payouts on Render:
+
+1. In Stripe Dashboard, create or use a Stripe account.
+2. Add the backend webhook endpoint:
+
+```text
+https://YOUR-RENDER-BACKEND.onrender.com/api/stripe/webhook
+```
+
+3. Subscribe to at least:
+
+```text
+checkout.session.completed
+payment_intent.succeeded
+```
+
+4. In Render environment variables, set:
+
+```bash
+MOCK_PAYMENT_MODE=false
+STRIPE_SECRET_KEY=sk_live_or_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+PUBLIC_APP_URL=https://pet-global-mocha.vercel.app
+BACKEND_BASE_URL=https://YOUR-RENDER-BACKEND.onrender.com
+```
+
+5. Sellers should open the wallet page and use "Connect Stripe payouts" to finish Stripe Connect onboarding.
+6. After an order is released and a seller requests a Stripe Connect withdrawal, an admin can mark the payout as paid. The backend creates a Stripe transfer and stores the transfer id.
+
+Do not commit Stripe keys to GitHub. Put them only in Render environment variables.
 
 ## Railway/Fly/VPS Backend Deployment
 

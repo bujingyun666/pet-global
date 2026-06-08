@@ -21,6 +21,14 @@ services:
         value: "0.08"
       - key: MOCK_PAYMENT_MODE
         value: "true"
+      - key: PUBLIC_APP_URL
+        value: https://pet-global-mocha.vercel.app
+      - key: BACKEND_BASE_URL
+        value: https://pet-global-api.onrender.com
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
       - key: I18N_ENABLED
         value: "true"
       - key: I18N_DEFAULT_LANG

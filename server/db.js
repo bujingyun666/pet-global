@@ -151,6 +151,16 @@ export function initializeDatabase() {
       created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS seller_payment_accounts (
+      user_id INTEGER PRIMARY KEY REFERENCES users(id),
+      provider TEXT NOT NULL,
+      provider_account_id TEXT NOT NULL UNIQUE,
+      status TEXT NOT NULL DEFAULT 'onboarding',
+      country TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   runMigrations();
@@ -179,6 +189,8 @@ function runMigrations() {
   ensureColumn("orders", "kyc_confirmed", "INTEGER NOT NULL DEFAULT 0");
   ensureColumn("orders", "total_due_cents", "INTEGER NOT NULL DEFAULT 0");
   ensureColumn("orders", "protection_days", "INTEGER NOT NULL DEFAULT 7");
+  ensureColumn("orders", "checkout_session_id", "TEXT");
+  ensureColumn("payout_requests", "provider_transfer_id", "TEXT");
 
   db.prepare(`
     UPDATE orders

@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "node server/index.js",
     "start": "node server/index.js",
-    "check": "node --check server/index.js && node --check server/db.js && node --check server/auth.js && node --check server/payments/mock-provider.js && node --check app.js",
+    "check": "node --check server/index.js && node --check server/db.js && node --check server/auth.js && node --check server/payments/mock-provider.js && node --check server/payments/stripe-provider.js && node --check app.js",
     "vercel-build": "node server/seed.js"
   },
   "dependencies": {
@@ -19,7 +19,7 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "nanoid": "^5.1.6",
+    "stripe": "^22.2.0",
     "zod": "^4.1.13"
-  },
-  "devDependencies": {}
+  }
 }

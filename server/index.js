@@ -18,6 +18,15 @@ import {
 } from "./auth.js";
 import { db, initializeDatabase, toBooking, toListing, toMessage, toOrder, toService } from "./db.js";
 import { confirmPaymentIntent, createPaymentIntent } from "./payments/mock-provider.js";
+import {
+  constructStripeWebhookEvent,
+  createStripeAccountLink,
+  createStripeCheckoutSession,
+  createStripeConnectAccount,
+  createStripeTransfer,
+  isStripeConfigured,
+  retrieveStripeCheckoutSession,
+} from "./payments/stripe-provider.js";
 
 initializeDatabase();
 
@@ -27,6 +36,13 @@ const app = express();
 const port = Number(process.env.PORT || 4174);
 const commissionRate = Number(process.env.COMMISSION_RATE || 0.08);
 const defaultServiceFeeCents = 18000;
+const publicAppUrl = String(process.env.PUBLIC_APP_URL || "http://127.0.0.1:4174").replace(/\/$/, "");
+const backendBaseUrl = String(process.env.BACKEND_BASE_URL || publicAppUrl).replace(/\/$/, "");
+const paymentProvider = !process.env.MOCK_PAYMENT_MODE || process.env.MOCK_PAYMENT_MODE === "true"
+  ? "mock"
+  : isStripeConfigured()
+    ? "stripe"
+    : "mock";
 const i18nEnabled = process.env.I18N_ENABLED !== "false";
 const i18nRuntimeConfig = {
   enabled: i18nEnabled,
@@ -205,6 +221,42 @@ app.use((req, res, next) => {
   if (req.method === "OPTIONS") return res.sendStatus(204);
   next();
 });
+app.post("/api/stripe/webhook", express.raw({ type: "application/json" }), (req, res) => {
+  let event;
+  try {
+    event = constructStripeWebhookEvent(req.body, req.headers["stripe-signature"]);
+  } catch (error) {
+    return res.status(400).send(`Webhook Error: ${error.message}`);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    if (session.payment_status === "paid") {
+      markOrderEscrowFunded({
+        eventId: event.id,
+        provider: "stripe",
+        orderId: session.metadata?.order_id || session.client_reference_id,
+        paymentIntentId: session.payment_intent || session.id,
+        payload: event,
+        note: "Stripe Checkout payment completed",
+      });
+    }
+  }
+
+  if (event.type === "payment_intent.succeeded") {
+    const intent = event.data.object;
+    markOrderEscrowFunded({
+      eventId: event.id,
+      provider: "stripe",
+      orderId: intent.metadata?.order_id,
+      paymentIntentId: intent.id,
+      payload: event,
+      note: "Stripe payment intent succeeded",
+    });
+  }
+
+  res.json({ received: true });
+});
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(express.static(projectRoot, { extensions: ["html"] }));
@@ -286,6 +338,10 @@ const payoutSchema = z.object({
 
 const payoutStatusSchema = z.object({
   status: z.enum(["approved", "paid", "rejected"]),
+});
+
+const stripeConnectSchema = z.object({
+  country: z.string().length(2).transform((value) => value.toUpperCase()),
 });
 
 function centsFromPrice(price) {
@@ -444,6 +500,28 @@ function insertOrderEvent(orderId, actorId, eventType, note = null) {
   `).run(orderId, actorId, eventType, note);
 }
 
+function markOrderEscrowFunded({ eventId, provider, orderId, paymentIntentId, payload, actorId = null, note }) {
+  if (!orderId || !paymentIntentId) return false;
+  const processPayment = db.transaction(() => {
+    const existing = db.prepare("SELECT id FROM payment_events WHERE id = ?").get(eventId);
+    if (existing) return false;
+    db.prepare(`
+      INSERT INTO payment_events (id, provider, payment_intent_id, event_type, payload_json)
+      VALUES (?, ?, ?, 'payment_intent.succeeded', ?)
+    `).run(eventId, provider, paymentIntentId, JSON.stringify(payload));
+    const update = db.prepare(`
+      UPDATE orders
+      SET status = 'escrow_funded', payment_intent_id = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND status = 'payment_pending'
+    `).run(paymentIntentId, orderId);
+    if (update.changes === 1) {
+      insertOrderEvent(orderId, actorId, "escrow_funded", note);
+    }
+    return update.changes === 1;
+  });
+  return processPayment();
+}
+
 function getServiceRows({ category, search } = {}) {
   const clauses = ["s.status = 'active'"];
   const params = {};
@@ -501,11 +579,23 @@ function getBookingRows({ user } = {}) {
 }
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, service: "pet-global", mockPaymentMode: true });
+  res.json({
+    ok: true,
+    service: "pet-global",
+    paymentProvider,
+    stripeConfigured: isStripeConfigured(),
+    mockPaymentMode: paymentProvider === "mock",
+  });
 });
 
 app.get("/api/config", (_req, res) => {
-  res.json({ i18n: i18nRuntimeConfig });
+  res.json({
+    i18n: i18nRuntimeConfig,
+    payments: {
+      provider: paymentProvider,
+      stripeConfigured: isStripeConfigured(),
+    },
+  });
 });
 
 app.post("/api/auth/register", (req, res) => {
@@ -670,7 +760,7 @@ app.post("/api/listings", requireAuth, requireRole("seller", "admin"), (req, res
   res.status(201).json({ listing: toListing(row) });
 });
 
-app.post("/api/orders", requireAuth, requireRole("buyer", "admin"), (req, res) => {
+app.post("/api/orders", requireAuth, requireRole("buyer", "admin"), async (req, res) => {
   const parsed = createOrderSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json(validationError(req, parsed.error));
 
@@ -688,13 +778,19 @@ app.post("/api/orders", requireAuth, requireRole("buyer", "admin"), (req, res) =
 
   const orderId = `TX-${nanoid(9).toUpperCase()}`;
   const amounts = calculateOrderAmounts(listing.price_cents);
-  const intent = createPaymentIntent({
-    orderId,
-    amountCents: amounts.totalDueCents,
-    currency: listing.currency,
-  });
+  const payment = paymentProvider === "mock"
+    ? createPaymentIntent({
+        orderId,
+        amountCents: amounts.totalDueCents,
+        currency: listing.currency,
+      })
+    : {
+        provider: "stripe",
+        paymentIntentId: null,
+        checkoutSessionId: null,
+      };
 
-  const createOrder = db.transaction(() => {
+  const createPendingOrder = db.transaction(() => {
     const lock = db
       .prepare("UPDATE listings SET status = 'sold' WHERE id = ? AND status = 'approved'")
       .run(listing.id);
@@ -707,9 +803,10 @@ app.post("/api/orders", requireAuth, requireRole("buyer", "admin"), (req, res) =
         service_fee_cents, seller_payout_cents, currency, status,
         payment_provider, payment_intent_id, contact_name, contact_phone,
         destination_country, destination_city, delivery_address, import_permit,
-        transport_option, buyer_note, kyc_confirmed, total_due_cents, protection_days
+        transport_option, buyer_note, kyc_confirmed, total_due_cents, protection_days,
+        checkout_session_id
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'payment_pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 7)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'payment_pending', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 7, ?)
     `).run(
       orderId,
       listing.id,
@@ -720,8 +817,8 @@ app.post("/api/orders", requireAuth, requireRole("buyer", "admin"), (req, res) =
       amounts.serviceFeeCents,
       amounts.sellerPayoutCents,
       listing.currency,
-      intent.provider,
-      intent.paymentIntentId,
+      payment.provider,
+      payment.paymentIntentId,
       parsed.data.contactName,
       parsed.data.contactPhone,
       parsed.data.destinationCountry,
@@ -732,6 +829,7 @@ app.post("/api/orders", requireAuth, requireRole("buyer", "admin"), (req, res) =
       parsed.data.buyerNote,
       parsed.data.kycConfirmed ? 1 : 0,
       amounts.totalDueCents,
+      payment.checkoutSessionId || null,
     );
     insertOrderEvent(orderId, req.user.id, "order_created", "Checkout submitted and pet inventory locked");
     db.prepare(`
@@ -745,7 +843,7 @@ app.post("/api/orders", requireAuth, requireRole("buyer", "admin"), (req, res) =
     );
   });
   try {
-    createOrder();
+    createPendingOrder();
   } catch (error) {
     if (error.message === "LISTING_LOCKED") {
       return res.status(409).json({ error: tt(req, "listing_already_locked") });
@@ -753,11 +851,75 @@ app.post("/api/orders", requireAuth, requireRole("buyer", "admin"), (req, res) =
     throw error;
   }
 
-  res.status(201).json({ order: orderById(orderId), payment: intent });
+  if (paymentProvider === "stripe") {
+    try {
+      const stripePayment = await createStripeCheckoutSession({
+        orderId,
+        listing,
+        buyer: req.user,
+        amounts,
+        successUrl: publicAppUrl,
+        cancelUrl: publicAppUrl,
+      });
+      db.prepare(`
+        UPDATE orders
+        SET payment_intent_id = ?, checkout_session_id = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(stripePayment.paymentIntentId, stripePayment.checkoutSessionId, orderId);
+      return res.status(201).json({ order: orderById(orderId), payment: stripePayment });
+    } catch (error) {
+      const rollbackOrder = db.transaction(() => {
+        db.prepare("UPDATE orders SET status = 'cancelled', updated_at = CURRENT_TIMESTAMP WHERE id = ?")
+          .run(orderId);
+        db.prepare("UPDATE listings SET status = 'approved' WHERE id = ? AND status = 'sold'")
+          .run(listing.id);
+        insertOrderEvent(orderId, req.user.id, "payment_session_failed", error.message.slice(0, 240));
+      });
+      rollbackOrder();
+      throw error;
+    }
+  }
+
+  res.status(201).json({ order: orderById(orderId), payment });
 });
 
 app.get("/api/orders", requireAuth, (req, res) => {
   res.json({ orders: getOrderRows({ user: req.user }).map(toOrder) });
+});
+
+app.post("/api/orders/:id/pay", requireAuth, async (req, res) => {
+  const order = db.prepare("SELECT * FROM orders WHERE id = ?").get(req.params.id);
+  if (!order) return res.status(404).json({ error: tt(req, "order_not_found") });
+  if (req.user.role !== "admin" && req.user.id !== order.buyer_id) {
+    return res.status(403).json({ error: tt(req, "permission_denied") });
+  }
+  if (order.status !== "payment_pending") {
+    return res.status(409).json({ error: tt(req, "order_payment_not_pending") });
+  }
+  if (order.payment_provider === "stripe" && order.checkout_session_id) {
+    const session = await retrieveStripeCheckoutSession(order.checkout_session_id);
+    return res.json({
+      payment: {
+        provider: "stripe",
+        orderId: order.id,
+        checkoutSessionId: session.id,
+        paymentIntentId: typeof session.payment_intent === "string" ? session.payment_intent : order.payment_intent_id,
+        checkoutUrl: session.url,
+        status: session.payment_status || session.status,
+      },
+    });
+  }
+  const event = confirmPaymentIntent(order.payment_intent_id);
+  markOrderEscrowFunded({
+    eventId: event.eventId,
+    provider: event.provider,
+    orderId: order.id,
+    paymentIntentId: event.paymentIntentId,
+    payload: event,
+    actorId: req.user.id,
+    note: "Mock payment confirmed",
+  });
+  res.json({ order: orderById(order.id), payment: event });
 });
 
 app.get("/api/messages", requireAuth, (req, res) => {
@@ -854,16 +1016,75 @@ app.post("/api/payouts", requireAuth, requireRole("seller"), (req, res) => {
   res.status(201).json({ payout: toPayout(payoutRows(req.user)[0]), available: payoutAvailableCents(req.user) / 100 });
 });
 
-app.patch("/api/admin/payouts/:id/status", requireAuth, requireRole("admin"), (req, res) => {
+app.post("/api/seller/stripe-connect", requireAuth, requireRole("seller"), async (req, res) => {
+  if (!isStripeConfigured()) {
+    return res.status(409).json({ error: "Stripe is not configured on this backend" });
+  }
+  const parsed = stripeConnectSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json(validationError(req, parsed.error));
+
+  let account = db
+    .prepare("SELECT * FROM seller_payment_accounts WHERE user_id = ? AND provider = 'stripe'")
+    .get(req.user.id);
+  if (!account) {
+    const stripeAccount = await createStripeConnectAccount({
+      user: req.user,
+      country: parsed.data.country,
+    });
+    db.prepare(`
+      INSERT INTO seller_payment_accounts (user_id, provider, provider_account_id, status, country)
+      VALUES (?, 'stripe', ?, 'onboarding', ?)
+    `).run(req.user.id, stripeAccount.id, parsed.data.country);
+    account = db
+      .prepare("SELECT * FROM seller_payment_accounts WHERE user_id = ? AND provider = 'stripe'")
+      .get(req.user.id);
+  }
+
+  const link = await createStripeAccountLink({
+    accountId: account.provider_account_id,
+    refreshUrl: `${publicAppUrl}?stripe_connect=refresh`,
+    returnUrl: `${publicAppUrl}?stripe_connect=return`,
+  });
+  res.json({
+    account: {
+      provider: "stripe",
+      accountId: account.provider_account_id,
+      status: account.status,
+      country: account.country,
+    },
+    onboardingUrl: link.url,
+  });
+});
+
+app.patch("/api/admin/payouts/:id/status", requireAuth, requireRole("admin"), async (req, res) => {
   const parsed = payoutStatusSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json(validationError(req, parsed.error));
 
   const row = db.prepare("SELECT * FROM payout_requests WHERE id = ?").get(req.params.id);
   if (!row) return res.status(404).json({ error: tt(req, "payout_not_found") });
+  let transfer = null;
+  if (parsed.data.status === "paid" && row.method === "stripe_connect" && isStripeConfigured()) {
+    const account = db
+      .prepare("SELECT * FROM seller_payment_accounts WHERE user_id = ? AND provider = 'stripe'")
+      .get(row.user_id);
+    const destination = account?.provider_account_id || row.account_ref;
+    transfer = await createStripeTransfer({
+      payoutId: row.id,
+      amountCents: row.amount_cents,
+      currency: row.currency,
+      destination,
+      transferGroup: row.id,
+    });
+    db.prepare(`
+      UPDATE payout_requests
+      SET provider_transfer_id = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(transfer.id, row.id);
+  }
   db.prepare("UPDATE payout_requests SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?")
     .run(parsed.data.status, req.params.id);
   const payout = payoutRows(req.user).find((item) => item.id === req.params.id);
-  res.json({ payout: toPayout(payout) });
+  res.json({ payout: toPayout(payout), transfer });
 });
 
 app.post("/api/orders/:id/mock-confirm-payment", requireAuth, (req, res) => {
@@ -877,21 +1098,15 @@ app.post("/api/orders/:id/mock-confirm-payment", requireAuth, (req, res) => {
   }
 
   const event = confirmPaymentIntent(order.payment_intent_id);
-  const processPayment = db.transaction(() => {
-    const existing = db.prepare("SELECT id FROM payment_events WHERE id = ?").get(event.eventId);
-    if (existing) return;
-    db.prepare(`
-      INSERT INTO payment_events (id, provider, payment_intent_id, event_type, payload_json)
-      VALUES (?, ?, ?, 'payment_intent.succeeded', ?)
-    `).run(event.eventId, event.provider, event.paymentIntentId, JSON.stringify(event));
-    db.prepare(`
-      UPDATE orders
-      SET status = 'escrow_funded', updated_at = CURRENT_TIMESTAMP
-      WHERE id = ? AND status = 'payment_pending'
-    `).run(order.id);
-    insertOrderEvent(order.id, req.user.id, "escrow_funded", "Mock payment confirmed");
+  markOrderEscrowFunded({
+    eventId: event.eventId,
+    provider: event.provider,
+    orderId: order.id,
+    paymentIntentId: event.paymentIntentId,
+    payload: event,
+    actorId: req.user.id,
+    note: "Mock payment confirmed",
   });
-  processPayment();
 
   res.json({ order: orderById(order.id), payment: event });
 });
