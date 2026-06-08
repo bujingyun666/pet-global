@@ -1,0 +1,141 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=1080, initial-scale=1" />
+  <title>PetGlobal Launch Poster</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      color: #12211f;
+      background: #edf5f2;
+    }
+    .poster {
+      position: relative;
+      width: 1080px;
+      height: 1350px;
+      overflow: hidden;
+      background:
+        linear-gradient(132deg, rgba(16, 72, 66, .94) 0%, rgba(16, 72, 66, .82) 38%, rgba(247, 250, 249, .96) 38.2%, rgba(247, 250, 249, .98) 100%);
+    }
+    .photo-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 44% 28% 28%;
+      grid-template-rows: 38% 31% 31%;
+      opacity: .34;
+    }
+    .photo-grid img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(1.06) contrast(1.04); }
+    .photo-grid img:nth-child(1) { grid-row: 1 / 3; }
+    .photo-grid img:nth-child(2) { grid-column: 2 / 4; }
+    .photo-grid img:nth-child(3) { grid-column: 2; grid-row: 2 / 4; }
+    .photo-grid img:nth-child(4) { grid-column: 3; grid-row: 2; }
+    .photo-grid img:nth-child(5) { grid-column: 1; grid-row: 3; }
+    .photo-grid img:nth-child(6) { grid-column: 3; grid-row: 3; }
+    .veil { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(16, 58, 53, .92), rgba(16, 58, 53, .68) 38%, rgba(247,250,249,.82) 63%, rgba(247,250,249,.95)); }
+    .brand {
+      position: absolute;
+      top: 58px;
+      left: 62px;
+      right: 62px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+    }
+    .brand-left { display: flex; align-items: center; gap: 18px; color: #fff; }
+    .mark { width: 68px; height: 68px; border-radius: 14px; display: grid; place-items: center; background: #0f7b70; color: #fff; font-size: 28px; font-weight: 900; box-shadow: 0 18px 40px rgba(0,0,0,.24); }
+    .brand-name strong { display: block; font-size: 30px; line-height: 1; letter-spacing: 0; }
+    .brand-name span { display: block; margin-top: 7px; color: #c8ebe5; font-size: 15px; font-weight: 800; letter-spacing: .14em; }
+    .tag { border-radius: 999px; padding: 12px 18px; background: rgba(255,255,255,.94); color: #0e6159; font-weight: 900; font-size: 17px; box-shadow: 0 14px 30px rgba(18,33,31,.16); }
+    .hero-copy { position: absolute; top: 174px; left: 62px; width: 650px; color: #fff; }
+    .eyebrow { margin: 0 0 18px; color: #9fe3d9; font-size: 22px; font-weight: 900; letter-spacing: .12em; }
+    h1 { margin: 0; font-size: 72px; line-height: .98; letter-spacing: 0; font-weight: 950; }
+    .subtitle { margin: 28px 0 0; max-width: 580px; color: #e5f5f2; font-size: 30px; line-height: 1.34; font-weight: 760; }
+    .english { margin-top: 20px; max-width: 560px; color: #bde6df; font-size: 22px; line-height: 1.42; font-weight: 720; }
+    .right-card {
+      position: absolute;
+      top: 258px;
+      right: 62px;
+      width: 326px;
+      border: 1px solid rgba(216,226,223,.94);
+      border-radius: 18px;
+      padding: 24px;
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 24px 54px rgba(18,33,31,.18);
+    }
+    .right-card h2 { margin: 0 0 16px; font-size: 31px; line-height: 1.1; color: #12332f; }
+    .qr { width: 210px; height: 210px; display: block; margin: 0 auto 18px; border-radius: 12px; background: #fff; }
+    .url { margin: 0; color: #0d5f58; font-size: 21px; line-height: 1.25; font-weight: 900; word-break: break-word; text-align: center; }
+    .features { position: absolute; left: 62px; right: 62px; bottom: 304px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .feature { min-height: 132px; border-radius: 16px; padding: 18px; background: rgba(255,255,255,.94); box-shadow: 0 18px 42px rgba(18,33,31,.14); }
+    .feature strong { display: block; margin-bottom: 10px; color: #103e39; font-size: 22px; line-height: 1.12; }
+    .feature span { color: #5e716d; font-size: 16px; line-height: 1.36; font-weight: 760; }
+    .merchant-strip { position: absolute; left: 62px; right: 62px; bottom: 178px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .merchant-strip div { border-radius: 16px; padding: 18px 20px; background: #12332f; color: #e4f4f1; font-size: 20px; line-height: 1.22; font-weight: 900; }
+    .merchant-strip span { display: block; margin-top: 8px; color: #9bded4; font-size: 15px; font-weight: 760; }
+    .cta { position: absolute; left: 62px; right: 62px; bottom: 58px; min-height: 86px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-radius: 18px; padding: 18px 24px; background: #0f7b70; color: #fff; box-shadow: 0 24px 54px rgba(15,123,112,.28); }
+    .cta strong { font-size: 30px; line-height: 1.08; }
+    .cta span { color: #d5f4ef; font-size: 18px; font-weight: 820; }
+    .cta .button { flex: 0 0 auto; border-radius: 12px; padding: 16px 22px; background: #fff; color: #0d5f58; font-size: 22px; font-weight: 950; }
+  </style>
+</head>
+<body>
+  <main class="poster">
+    <div class="photo-grid" aria-hidden="true">
+      <img src="../assets/dog.jpg" />
+      <img src="../assets/cockatiel.jpg" />
+      <img src="../assets/cat.jpg" />
+      <img src="../assets/rabbit.jpg" />
+      <img src="../assets/golden.png" />
+      <img src="../assets/horse.jpg" />
+    </div>
+    <div class="veil"></div>
+
+    <section class="brand">
+      <div class="brand-left">
+        <div class="mark">PG</div>
+        <div class="brand-name"><strong>PetGlobal</strong><span>GLOBAL PET ESCROW MARKET</span></div>
+      </div>
+      <div class="tag">商家入驻 · 全球推广</div>
+    </section>
+
+    <section class="hero-copy">
+      <p class="eyebrow">BUY · SELL · ESCROW · GLOBAL</p>
+      <h1>全球宠物<br />交易平台</h1>
+      <p class="subtitle">认证宠物、宠物用品、投喂洗护服务，一站式面向全球买家展示与成交。</p>
+      <p class="english">Verified pet marketplace with escrow payments, seller onboarding, compliance files, and pet supplies shop.</p>
+    </section>
+
+    <aside class="right-card">
+      <h2>扫码进入平台<br />Start Trading</h2>
+      <img class="qr" src="petglobal-qr.png" />
+      <p class="url">pet-global-mocha.vercel.app</p>
+    </aside>
+
+    <section class="features">
+      <div class="feature"><strong>托管交易</strong><span>买家付款先进入平台托管，验收完成后再结算。</span></div>
+      <div class="feature"><strong>认证商家</strong><span>支持实名、疫苗、芯片、健康证与进出口资料。</span></div>
+      <div class="feature"><strong>全球展示</strong><span>中文/英文自动切换，适合跨境买家访问。</span></div>
+      <div class="feature"><strong>多类目销售</strong><span>宠物、食品、玩具、衣服、用品和服务都可上架。</span></div>
+    </section>
+
+    <section class="merchant-strip">
+      <div>宠物商家入驻<span>Breeders & certified sellers</span></div>
+      <div>宠物用品上架<span>Food, toys, clothing, supplies</span></div>
+      <div>服务商合作<span>Care, grooming, transport</span></div>
+    </section>
+
+    <section class="cta">
+      <div><strong>现在发布商品，连接全球宠物买家</strong><br /><span>Apply as a seller and grow with PetGlobal.</span></div>
+      <div class="button">立即访问</div>
+    </section>
+  </main>
+</body>
+</html>
