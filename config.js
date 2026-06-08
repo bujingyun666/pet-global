@@ -1,3 +1,3 @@
 window.PETGLOBAL_CONFIG = {
-  apiBaseUrl: "",
+  apiBaseUrl: "https://pet-global.onrender.com",
 };
