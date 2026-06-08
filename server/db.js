@@ -127,6 +127,55 @@ export function initializeDatabase() {
       updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
 
+    CREATE TABLE IF NOT EXISTS shop_products (
+      id TEXT PRIMARY KEY,
+      seller_id INTEGER NOT NULL REFERENCES users(id),
+      title TEXT NOT NULL,
+      category TEXT NOT NULL CHECK (category IN ('food', 'toys', 'clothing', 'housing', 'health', 'grooming', 'travel', 'other')),
+      description TEXT NOT NULL,
+      price_cents INTEGER NOT NULL CHECK (price_cents > 0),
+      currency TEXT NOT NULL DEFAULT 'USD',
+      stock INTEGER NOT NULL CHECK (stock >= 0),
+      image TEXT NOT NULL,
+      status TEXT NOT NULL CHECK (status IN ('active', 'review', 'paused', 'sold_out')) DEFAULT 'active',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS shop_orders (
+      id TEXT PRIMARY KEY,
+      buyer_id INTEGER NOT NULL REFERENCES users(id),
+      seller_id INTEGER NOT NULL REFERENCES users(id),
+      subtotal_cents INTEGER NOT NULL,
+      commission_cents INTEGER NOT NULL,
+      shipping_cents INTEGER NOT NULL,
+      seller_payout_cents INTEGER NOT NULL,
+      total_due_cents INTEGER NOT NULL,
+      currency TEXT NOT NULL DEFAULT 'USD',
+      status TEXT NOT NULL CHECK (status IN ('payment_pending', 'paid', 'packed', 'shipped', 'delivered', 'cancelled', 'refunded')),
+      payment_provider TEXT,
+      payment_intent_id TEXT UNIQUE,
+      checkout_session_id TEXT,
+      contact_name TEXT NOT NULL DEFAULT '',
+      contact_phone TEXT NOT NULL DEFAULT '',
+      shipping_country TEXT NOT NULL DEFAULT '',
+      shipping_city TEXT NOT NULL DEFAULT '',
+      shipping_address TEXT NOT NULL DEFAULT '',
+      buyer_note TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS shop_order_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id TEXT NOT NULL REFERENCES shop_orders(id),
+      product_id TEXT NOT NULL REFERENCES shop_products(id),
+      title TEXT NOT NULL,
+      quantity INTEGER NOT NULL CHECK (quantity > 0),
+      unit_price_cents INTEGER NOT NULL,
+      line_total_cents INTEGER NOT NULL
+    );
+
     CREATE TABLE IF NOT EXISTS messages (
       id TEXT PRIMARY KEY,
       user_id INTEGER REFERENCES users(id),
@@ -424,6 +473,72 @@ function seedDefaults() {
     });
   }
 
+  const productCount = db.prepare("SELECT COUNT(*) AS count FROM shop_products").get().count;
+  if (!productCount) {
+    const insertProduct = db.prepare(`
+      INSERT INTO shop_products (
+        id, seller_id, title, category, description, price_cents, currency,
+        stock, image, status
+      )
+      VALUES (
+        @id, @sellerId, @title, @category, @description, @priceCents,
+        'USD', @stock, @image, 'active'
+      )
+    `);
+    [
+      {
+        id: "PR-FOOD-001",
+        title: "Grain-free puppy food",
+        category: "food",
+        description: "High-protein dry food for puppies and active young dogs.",
+        priceCents: 3499,
+        stock: 28,
+        image: "/assets/golden.png",
+      },
+      {
+        id: "PR-TOY-001",
+        title: "Puzzle treat toy",
+        category: "toys",
+        description: "Interactive feeding toy for daily enrichment and slow feeding.",
+        priceCents: 1899,
+        stock: 46,
+        image: "/assets/hero.png",
+      },
+      {
+        id: "PR-CLOTH-001",
+        title: "Waterproof pet jacket",
+        category: "clothing",
+        description: "Lightweight rain jacket with reflective trim for outdoor walks.",
+        priceCents: 4299,
+        stock: 18,
+        image: "/assets/dog.jpg",
+      },
+      {
+        id: "PR-HOME-001",
+        title: "Washable pet bed",
+        category: "housing",
+        description: "Soft washable bed suitable for cats and small dogs.",
+        priceCents: 5699,
+        stock: 12,
+        image: "/assets/cat.jpg",
+      },
+      {
+        id: "PR-CARE-001",
+        title: "Gentle grooming kit",
+        category: "grooming",
+        description: "Brush, nail file and comb set for home grooming routines.",
+        priceCents: 2499,
+        stock: 34,
+        image: "/assets/wash.png",
+      },
+    ].forEach((product) => {
+      insertProduct.run({
+        ...product,
+        sellerId: seller.id,
+      });
+    });
+  }
+
   const messageCount = db.prepare("SELECT COUNT(*) AS count FROM messages").get().count;
   if (!messageCount) {
     const insertMessage = db.prepare(`
@@ -558,6 +673,56 @@ export function toBooking(row) {
     providerPayout: row.provider_payout_cents / 100,
     currency: row.currency,
     status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function toShopProduct(row) {
+  return {
+    id: row.id,
+    sellerId: row.seller_id,
+    seller: row.seller_name,
+    title: row.title,
+    category: row.category,
+    description: row.description,
+    price: row.price_cents / 100,
+    priceCents: row.price_cents,
+    currency: row.currency,
+    stock: row.stock,
+    image: row.image,
+    status: row.status,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+export function toShopOrder(row) {
+  const items = row.items_json ? JSON.parse(row.items_json) : [];
+  return {
+    id: row.id,
+    buyerId: row.buyer_id,
+    buyer: row.buyer_name,
+    sellerId: row.seller_id,
+    seller: row.seller_name,
+    items,
+    itemTitle: items.map((item) => `${item.title} x${item.quantity}`).join(", "),
+    subtotal: row.subtotal_cents / 100,
+    commission: row.commission_cents / 100,
+    shipping: row.shipping_cents / 100,
+    sellerPayout: row.seller_payout_cents / 100,
+    totalDue: row.total_due_cents / 100,
+    currency: row.currency,
+    contactName: row.contact_name || "",
+    contactPhone: row.contact_phone || "",
+    shippingCountry: row.shipping_country || "",
+    shippingCity: row.shipping_city || "",
+    shippingAddress: row.shipping_address || "",
+    buyerNote: row.buyer_note || "",
+    status: row.status,
+    paymentProvider: row.payment_provider,
+    paymentIntentId: row.payment_intent_id,
+    checkoutSessionId: row.checkout_session_id,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

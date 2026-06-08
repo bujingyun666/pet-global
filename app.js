@@ -20,6 +20,8 @@ const commissionPolicy = {
   serviceFeeCents: 18000,
 };
 let serviceCommissionRate = 0.15;
+let shopCommissionRate = 0.12;
+let shopShippingFeeCents = 999;
 
 const runtimeConfig = window.PETGLOBAL_CONFIG || {};
 const apiBaseUrl = String(runtimeConfig.apiBaseUrl || "").replace(/\/$/, "");
@@ -47,6 +49,7 @@ const i18nLang = {
     commission_profit: "手续费盈利",
     compliance_review: "合规审查",
     market: "市场",
+    shop: "商店",
     services: "投喂",
     bookings: "预约",
     transactions: "交易",
@@ -56,6 +59,7 @@ const i18nLang = {
     revenue: "收益",
     live_marketplace: "LIVE MARKETPLACE",
     market_title: "全球认证宠物市场",
+    shop_title: "宠物食品玩具与用品商店",
     services_title: "投喂洗护与宠物服务",
     bookings_title: "服务预约与验收",
     transactions_title: "交易流水与托管状态",
@@ -66,11 +70,21 @@ const i18nLang = {
     search_placeholder: "搜索品种、国家、卖家、服务",
     currency: "货币",
     publish_pet: "发布宠物",
+    publish_product: "上架商品",
     active_items: "在售宠物/服务",
     monthly_gmv: "本月成交额",
     platform_fees: "平台手续费",
     compliance_pass_rate: "合规通过率",
     all: "全部",
+    all_products: "全部商品",
+    shop_food: "宠物食品",
+    shop_toys: "宠物玩具",
+    shop_clothing: "宠物衣服",
+    shop_housing: "窝垫笼具",
+    shop_health: "健康用品",
+    shop_grooming: "洗护用品",
+    shop_travel: "出行用品",
+    shop_other: "其他用品",
     dogs: "犬类",
     cats: "猫类",
     small_mammal: "小型哺乳",
@@ -116,6 +130,29 @@ const i18nLang = {
     stripe_connect_hint: "完成 Stripe Connect 后，平台可把已释放订单款打给卖家。",
     stripe_connect_failed: "Stripe 收款账户连接失败",
     no_transactions: "暂无交易。",
+    no_products: "暂无匹配商品",
+    adjust_shop_filters: "换一个商品分类或关键词再试。",
+    product_title: "商品名称",
+    product_category: "商品分类",
+    product_description: "商品描述",
+    product_image: "商品图片",
+    product_stock: "库存",
+    stock_left: "库存",
+    buy_now: "立即购买",
+    shop_checkout: "购买商品",
+    shop_order: "商品订单",
+    submit_product: "提交商品",
+    submit_shop_order: "提交商品订单",
+    quantity: "数量",
+    shipping_country: "收货国家",
+    shipping_city: "收货城市",
+    shipping_address: "收货地址",
+    shop_summary_title: "商品金额由后台按库存和运费重新计算",
+    product_subtotal: "商品小计",
+    shipping_fee: "配送费",
+    shop_platform_fee: "商品平台佣金",
+    product_publish_failed: "商品上架失败",
+    shop_order_failed: "商品订单创建失败",
     service_hero_title: "交易之外，也能预约投喂、洗护、寄养和接送",
     service_hero_body: "参考宠投喂 App 的服务入口：用户下单后进入平台记录，服务完成后再结算给服务者。",
     all_services: "全部服务",
@@ -195,6 +232,7 @@ const i18nLang = {
     booking_failed: "提交预约失败",
     t_plus_one_review: "T+1 复核",
     pet_trade: "宠物交易",
+    shop_sales: "商品销售",
     care_services: "投喂服务",
     compliance_region: "合规服务",
     transport_region: "运输服务",
@@ -237,6 +275,9 @@ const i18nLang = {
     paypal: "PayPal",
     stripe_connect: "Stripe Connect",
     paid: "已打款",
+    packed: "已打包",
+    shipped: "已发货",
+    refunded: "已退款",
     rejected: "已拒绝",
     network_error: "不好意思，网络有点差，再试一下？",
     trade_create_failed: "创建托管交易失败",
@@ -285,6 +326,7 @@ const i18nLang = {
     commission_profit: "Commission revenue",
     compliance_review: "Compliance review",
     market: "Market",
+    shop: "Shop",
     services: "Care",
     bookings: "Bookings",
     transactions: "Trades",
@@ -294,6 +336,7 @@ const i18nLang = {
     revenue: "Revenue",
     live_marketplace: "LIVE MARKETPLACE",
     market_title: "Global Verified Pet Market",
+    shop_title: "Pet Food, Toys and Supplies Store",
     services_title: "Feeding, Grooming and Pet Care",
     bookings_title: "Service Bookings and Acceptance",
     transactions_title: "Escrow Trades and Order Flow",
@@ -304,11 +347,21 @@ const i18nLang = {
     search_placeholder: "Search breed, country, seller, service",
     currency: "Currency",
     publish_pet: "Publish pet",
+    publish_product: "List product",
     active_items: "Active pets/services",
     monthly_gmv: "Monthly GMV",
     platform_fees: "Platform fees",
     compliance_pass_rate: "Compliance pass rate",
     all: "All",
+    all_products: "All products",
+    shop_food: "Pet food",
+    shop_toys: "Pet toys",
+    shop_clothing: "Pet clothing",
+    shop_housing: "Beds and housing",
+    shop_health: "Health supplies",
+    shop_grooming: "Grooming supplies",
+    shop_travel: "Travel gear",
+    shop_other: "Other supplies",
     dogs: "Dogs",
     cats: "Cats",
     small_mammal: "Small mammals",
@@ -354,6 +407,29 @@ const i18nLang = {
     stripe_connect_hint: "After Stripe Connect onboarding, released order funds can be transferred to the seller.",
     stripe_connect_failed: "Stripe payout setup failed",
     no_transactions: "No trades yet.",
+    no_products: "No matching products",
+    adjust_shop_filters: "Try another product category or keyword.",
+    product_title: "Product name",
+    product_category: "Product category",
+    product_description: "Product description",
+    product_image: "Product image",
+    product_stock: "Stock",
+    stock_left: "Stock",
+    buy_now: "Buy now",
+    shop_checkout: "Buy product",
+    shop_order: "Shop order",
+    submit_product: "Submit product",
+    submit_shop_order: "Submit shop order",
+    quantity: "Quantity",
+    shipping_country: "Shipping country",
+    shipping_city: "Shipping city",
+    shipping_address: "Shipping address",
+    shop_summary_title: "Product total is recalculated by backend with stock and shipping",
+    product_subtotal: "Product subtotal",
+    shipping_fee: "Shipping fee",
+    shop_platform_fee: "Product platform commission",
+    product_publish_failed: "Failed to list product",
+    shop_order_failed: "Failed to create shop order",
     service_hero_title: "Book feeding, grooming, boarding and pickup beyond pet trades",
     service_hero_body: "Inspired by the local feeding app: bookings are recorded on-platform and providers settle after completion.",
     all_services: "All services",
@@ -433,6 +509,7 @@ const i18nLang = {
     booking_failed: "Failed to submit booking",
     t_plus_one_review: "T+1 review",
     pet_trade: "Pet trade",
+    shop_sales: "Shop sales",
     care_services: "Care services",
     compliance_region: "Compliance",
     transport_region: "Transport",
@@ -475,6 +552,9 @@ const i18nLang = {
     paypal: "PayPal",
     stripe_connect: "Stripe Connect",
     paid: "Paid",
+    packed: "Packed",
+    shipped: "Shipped",
+    refunded: "Refunded",
     rejected: "Rejected",
     network_error: "Sorry, network error, please try again.",
     trade_create_failed: "Failed to create escrow trade",
@@ -541,6 +621,17 @@ const listingSpeciesOptions = [
   ["Farm animal", "farm_animals"],
   ["Exotic pet", "exotic_pets"],
   ["Other", "other_species"],
+];
+
+const shopCategoryOptions = [
+  ["food", "shop_food"],
+  ["toys", "shop_toys"],
+  ["clothing", "shop_clothing"],
+  ["housing", "shop_housing"],
+  ["health", "shop_health"],
+  ["grooming", "shop_grooming"],
+  ["travel", "shop_travel"],
+  ["other", "shop_other"],
 ];
 
 const symbols = {
@@ -747,6 +838,57 @@ const fallbackServices = [
   },
 ];
 
+const fallbackProducts = [
+  {
+    id: "PR-FOOD-001",
+    seller: "Kiwi Hills Kennel",
+    title: "Grain-free puppy food",
+    category: "food",
+    description: "High-protein dry food for puppies and active young dogs.",
+    price: 34.99,
+    priceCents: 3499,
+    stock: 28,
+    image: "./assets/golden.png",
+    status: "active",
+  },
+  {
+    id: "PR-TOY-001",
+    seller: "Kiwi Hills Kennel",
+    title: "Puzzle treat toy",
+    category: "toys",
+    description: "Interactive feeding toy for daily enrichment and slow feeding.",
+    price: 18.99,
+    priceCents: 1899,
+    stock: 46,
+    image: "./assets/hero.png",
+    status: "active",
+  },
+  {
+    id: "PR-CLOTH-001",
+    seller: "Kiwi Hills Kennel",
+    title: "Waterproof pet jacket",
+    category: "clothing",
+    description: "Lightweight rain jacket with reflective trim for outdoor walks.",
+    price: 42.99,
+    priceCents: 4299,
+    stock: 18,
+    image: "./assets/dog.jpg",
+    status: "active",
+  },
+  {
+    id: "PR-HOME-001",
+    seller: "Tokyo Cattery Co.",
+    title: "Washable pet bed",
+    category: "housing",
+    description: "Soft washable bed suitable for cats and small dogs.",
+    price: 56.99,
+    priceCents: 5699,
+    stock: 12,
+    image: "./assets/cat.jpg",
+    status: "active",
+  },
+];
+
 const fallbackOrders = [
   {
     id: "TX-89021",
@@ -760,6 +902,8 @@ const fallbackOrders = [
     status: "escrow_funded",
   },
 ];
+
+const fallbackShopOrders = [];
 
 const fallbackBookings = [
   {
@@ -804,14 +948,18 @@ let state = {
   user: null,
   view: "market",
   filter: "all",
+  shopFilter: "all",
   serviceFilter: "all",
   query: "",
   currency: "USD",
   selectedId: fallbackListings[0].id,
+  selectedProductId: fallbackProducts[0].id,
   selectedServiceId: fallbackServices[0].id,
   listings: [...fallbackListings],
+  products: [...fallbackProducts],
   services: [...fallbackServices],
   orders: [...fallbackOrders],
+  shopOrders: [...fallbackShopOrders],
   bookings: [...fallbackBookings],
   messages: [...fallbackMessages],
   wallet: null,
@@ -829,12 +977,14 @@ const logoutBtn = document.querySelector("#logoutBtn");
 const listingGrid = document.querySelector("#listingGrid");
 const dealPanel = document.querySelector("#dealPanel");
 const filterButtons = [...document.querySelectorAll(".filter-pill[data-filter]")];
+const shopFilterButtons = [...document.querySelectorAll(".filter-pill[data-shop-filter]")];
 const serviceFilterButtons = [...document.querySelectorAll(".filter-pill[data-service-filter]")];
 const searchInput = document.querySelector("#searchInput");
 const currencySelect = document.querySelector("#currencySelect");
 const navItems = [...document.querySelectorAll(".nav-item")];
 const viewTitle = document.querySelector("#viewTitle");
 const transactionBody = document.querySelector("#transactionBody");
+const shopGrid = document.querySelector("#shopGrid");
 const serviceGrid = document.querySelector("#serviceGrid");
 const bookingList = document.querySelector("#bookingList");
 const messageList = document.querySelector("#messageList");
@@ -856,7 +1006,14 @@ const checkoutForm = document.querySelector("#checkoutForm");
 const checkoutDialogTitle = document.querySelector("#checkoutDialogTitle");
 const checkoutSummary = document.querySelector("#checkoutSummary");
 const newListingBtn = document.querySelector("#newListingBtn");
+const newProductBtn = document.querySelector("#newProductBtn");
 const listingForm = document.querySelector("#listingForm");
+const productDialog = document.querySelector("#productDialog");
+const productForm = document.querySelector("#productForm");
+const shopCheckoutDialog = document.querySelector("#shopCheckoutDialog");
+const shopCheckoutForm = document.querySelector("#shopCheckoutForm");
+const shopCheckoutDialogTitle = document.querySelector("#shopCheckoutDialogTitle");
+const shopCheckoutSummary = document.querySelector("#shopCheckoutSummary");
 const langSwitch = document.querySelector("#langSwitch");
 const langSelect = document.querySelector("#langSelect");
 
@@ -922,6 +1079,7 @@ function walletItemTitle(item) {
 function walletItemType(type) {
   if (type === "pet-trade") return t("pet_trade");
   if (type === "service") return t("care_services");
+  if (type === "shop-order") return t("shop_sales");
   return type;
 }
 
@@ -960,6 +1118,17 @@ function orderAmounts(listing) {
   const sellerPayout = Number((price - price * 0.015).toFixed(2));
   const totalDue = Number((price + fee).toFixed(2));
   return { price, commission, commissionRate, serviceFee, fee, sellerPayout, totalDue };
+}
+
+function shopOrderAmounts(product, quantity = 1) {
+  const price = Number(product?.price || 0);
+  const qty = Math.max(1, Number(quantity || 1));
+  const subtotal = Number((price * qty).toFixed(2));
+  const commission = Number((subtotal * shopCommissionRate).toFixed(2));
+  const shipping = Number((shopShippingFeeCents / 100).toFixed(2));
+  const sellerPayout = Number((subtotal - commission).toFixed(2));
+  const totalDue = Number((subtotal + shipping).toFixed(2));
+  return { price, quantity: qty, subtotal, commission, shipping, sellerPayout, totalDue };
 }
 
 function optionLabel(value) {
@@ -1015,6 +1184,10 @@ function selectedListing() {
   return state.listings.find((listing) => listing.id === state.selectedId) || state.listings[0];
 }
 
+function selectedProduct() {
+  return state.products.find((product) => product.id === state.selectedProductId) || state.products[0];
+}
+
 function selectedService() {
   return state.services.find((service) => service.id === state.selectedServiceId) || state.services[0];
 }
@@ -1023,6 +1196,14 @@ function filteredListings() {
   return state.listings.filter((listing) => {
     const matchesFilter = state.filter === "all" || listing.species === state.filter;
     const haystack = `${listing.name} ${listing.breed} ${listing.country} ${listing.seller}`.toLowerCase();
+    return matchesFilter && haystack.includes(state.query.toLowerCase());
+  });
+}
+
+function filteredProducts() {
+  return state.products.filter((product) => {
+    const matchesFilter = state.shopFilter === "all" || product.category === state.shopFilter;
+    const haystack = `${product.title} ${product.description} ${product.category} ${product.seller}`.toLowerCase();
     return matchesFilter && haystack.includes(state.query.toLowerCase());
   });
 }
@@ -1067,6 +1248,15 @@ function renderSpeciesSelect(select) {
   select.value = selected;
 }
 
+function renderShopCategorySelect(select) {
+  if (!select) return;
+  const selected = select.value || "food";
+  select.innerHTML = shopCategoryOptions
+    .map(([value, key]) => `<option value="${value}">${t(key)}</option>`)
+    .join("");
+  select.value = selected;
+}
+
 function renderAllPageText() {
   document.documentElement.lang = currentLang === "zh" ? "zh-CN" : "en";
   document.title = currentLang === "zh" ? "PetGlobal Trade - 全球宠物交易与投喂服务" : "PetGlobal Trade - Global Pet Trade and Care";
@@ -1088,6 +1278,7 @@ function renderAllPageText() {
 
   const navLabels = {
     market: "market",
+    shop: "shop",
     services: "services",
     bookings: "bookings",
     transactions: "transactions",
@@ -1106,6 +1297,8 @@ function renderAllPageText() {
   currencySelect.setAttribute("aria-label", t("currency"));
   newListingBtn.setAttribute("aria-label", t("publish_pet"));
   newListingBtn.setAttribute("title", t("publish_pet"));
+  newProductBtn.setAttribute("aria-label", t("publish_product"));
+  newProductBtn.setAttribute("title", t("publish_product"));
 
   const metricLabels = document.querySelectorAll(".metrics-grid article span");
   [t("active_items"), t("monthly_gmv"), t("platform_fees"), t("compliance_pass_rate")].forEach((text, index) => {
@@ -1114,6 +1307,11 @@ function renderAllPageText() {
   const listingFilters = [["all", "all"], ...listingSpeciesOptions];
   listingFilters.forEach(([value, key]) => {
     const button = document.querySelector(`[data-filter="${value}"]`);
+    if (button) button.textContent = t(key);
+  });
+  const shopFilters = [["all", "all_products"], ...shopCategoryOptions];
+  shopFilters.forEach(([value, key]) => {
+    const button = document.querySelector(`[data-shop-filter="${value}"]`);
     if (button) button.textContent = t(key);
   });
 
@@ -1184,6 +1382,18 @@ function renderAllPageText() {
   if (priceLabel) priceLabel.childNodes[0].textContent = `${t("price_usd")} `;
   listingForm.querySelector(".primary-action").lastChild.textContent = ` ${t("submit_review")}`;
 
+  const productLabels = productForm.querySelectorAll("label");
+  setText("#productForm h3", t("publish_product"));
+  if (productLabels[0]) productLabels[0].childNodes[0].textContent = `${t("product_title")} `;
+  if (productLabels[1]) productLabels[1].childNodes[0].textContent = `${t("product_category")} `;
+  if (productLabels[2]) productLabels[2].childNodes[0].textContent = `${t("product_stock")} `;
+  if (productLabels[3]) productLabels[3].childNodes[0].textContent = `${t("product_description")} `;
+  if (productLabels[4]) productLabels[4].childNodes[0].textContent = `${t("product_image")} `;
+  const productPriceLabel = productForm.querySelector('input[name="price"]')?.closest("label");
+  if (productPriceLabel) productPriceLabel.childNodes[0].textContent = `${t("price_usd")} `;
+  renderShopCategorySelect(productForm.elements.category);
+  productForm.querySelector(".primary-action").lastChild.textContent = ` ${t("submit_product")}`;
+
   setText("#checkoutDialogTitle", t("checkout_order"));
   const checkoutLabels = checkoutForm.querySelectorAll("label");
   if (checkoutLabels[0]) checkoutLabels[0].childNodes[0].textContent = `${t("contact_name")} `;
@@ -1202,6 +1412,17 @@ function renderAllPageText() {
   setSelectOptionText(checkoutForm.elements.transportOption, "seller_arranged", t("seller_arranged"));
   setSelectOptionText(checkoutForm.elements.transportOption, "buyer_arranged", t("buyer_arranged"));
   checkoutForm.querySelector(".primary-action").lastChild.textContent = ` ${t("submit_escrow_order")}`;
+
+  setText("#shopCheckoutDialogTitle", t("shop_checkout"));
+  const shopCheckoutLabels = shopCheckoutForm.querySelectorAll("label");
+  if (shopCheckoutLabels[0]) shopCheckoutLabels[0].childNodes[0].textContent = `${t("quantity")} `;
+  if (shopCheckoutLabels[1]) shopCheckoutLabels[1].childNodes[0].textContent = `${t("contact_name")} `;
+  if (shopCheckoutLabels[2]) shopCheckoutLabels[2].childNodes[0].textContent = `${t("contact_phone")} `;
+  if (shopCheckoutLabels[3]) shopCheckoutLabels[3].childNodes[0].textContent = `${t("shipping_country")} `;
+  if (shopCheckoutLabels[4]) shopCheckoutLabels[4].childNodes[0].textContent = `${t("shipping_city")} `;
+  if (shopCheckoutLabels[5]) shopCheckoutLabels[5].childNodes[0].textContent = `${t("shipping_address")} `;
+  if (shopCheckoutLabels[6]) shopCheckoutLabels[6].childNodes[0].textContent = `${t("buyer_note")} `;
+  shopCheckoutForm.querySelector(".primary-action").lastChild.textContent = ` ${t("submit_shop_order")}`;
 
   const bookingLabels = bookingForm.querySelectorAll("label");
   if (bookingLabels[0]) bookingLabels[0].childNodes[0].textContent = `${t("pet_name")} `;
@@ -1226,11 +1447,13 @@ function renderAllPageText() {
 function renderMetrics() {
   const gmv =
     state.orders.reduce((sum, item) => sum + Number(item.amount || 0), 0) +
-    state.bookings.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    state.bookings.reduce((sum, item) => sum + Number(item.amount || 0), 0) +
+    state.shopOrders.reduce((sum, item) => sum + Number(item.subtotal || 0), 0);
   const fees =
     state.orders.reduce((sum, item) => sum + Number(item.fee || 0), 0) +
-    state.bookings.reduce((sum, item) => sum + Number(item.commission || 0), 0);
-  document.querySelector("#metricListings").textContent = state.listings.length + state.services.length;
+    state.bookings.reduce((sum, item) => sum + Number(item.commission || 0), 0) +
+    state.shopOrders.reduce((sum, item) => sum + Number(item.commission || 0), 0);
+  document.querySelector("#metricListings").textContent = state.listings.length + state.services.length + state.products.length;
   document.querySelector("#metricGmv").textContent = money(gmv);
   document.querySelector("#metricFees").textContent = money(fees);
 }
@@ -1285,6 +1508,50 @@ function renderListings() {
       if (button.dataset.buy) await createEscrowIntent(selectedListing());
       render();
     });
+  });
+}
+
+function renderShop() {
+  const products = filteredProducts();
+  shopGrid.innerHTML = products
+    .map(
+      (product) => {
+        const canBuy = product.status === "active" && Number(product.stock || 0) > 0 && state.user?.role !== "seller";
+        return `
+          <article class="service-card">
+            <img src="${assetUrl(product.image)}" alt="${product.title}" />
+            <div class="service-card-body">
+              <div class="listing-head">
+                <div>
+                  <h3>${product.title}</h3>
+                  <p>${t(shopCategoryOptions.find(([value]) => value === product.category)?.[1] || "shop_other")} · ${product.seller || t("verified_seller")}</p>
+                </div>
+                <span class="price">${money(product.price)}</span>
+              </div>
+              <p>${product.description}</p>
+              <div class="doc-row">
+                <span class="doc-chip">${t("stock_left")} ${product.stock}</span>
+                <span class="doc-chip">${statusLabel(product.status)}</span>
+              </div>
+              <div class="card-actions">
+                <button class="primary-action" type="button" data-buy-product="${product.id}" ${canBuy ? "" : "disabled"}>
+                  <i data-lucide="shopping-cart" aria-hidden="true"></i>
+                  ${t("buy_now")}
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      },
+    )
+    .join("");
+
+  if (!products.length) {
+    shopGrid.innerHTML = `<article class="service-card"><div class="service-card-body"><h3>${t("no_products")}</h3><p>${t("adjust_shop_filters")}</p></div></article>`;
+  }
+
+  shopGrid.querySelectorAll("[data-buy-product]").forEach((button) => {
+    button.addEventListener("click", () => openShopCheckoutDialog(button.dataset.buyProduct));
   });
 }
 
@@ -1353,6 +1620,21 @@ function renderCheckoutSummary(listing) {
   `;
 }
 
+function renderShopCheckoutSummary(product) {
+  const quantity = Number(shopCheckoutForm.elements.quantity.value || 1);
+  const amounts = shopOrderAmounts(product, quantity);
+  shopCheckoutSummary.innerHTML = `
+    <strong>${t("shop_summary_title")}</strong>
+    <div class="fee-lines">
+      <div><span>${t("product_title")}</span><strong>${product.title}</strong></div>
+      <div><span>${t("quantity")}</span><strong>${amounts.quantity}</strong></div>
+      <div><span>${t("product_subtotal")}</span><strong>${money(amounts.subtotal)}</strong></div>
+      <div><span>${t("shipping_fee")}</span><strong>${money(amounts.shipping)}</strong></div>
+      <div><span>${t("total_due")}</span><strong>${money(amounts.totalDue)}</strong></div>
+    </div>
+  `;
+}
+
 function openCheckoutDialog(listingId) {
   const listing = state.listings.find((item) => item.id === listingId);
   if (!listing) return;
@@ -1363,6 +1645,21 @@ function openCheckoutDialog(listingId) {
   renderCheckoutSummary(listing);
   if (typeof checkoutDialog.showModal === "function") {
     checkoutDialog.showModal();
+  }
+}
+
+function openShopCheckoutDialog(productId) {
+  const product = state.products.find((item) => item.id === productId);
+  if (!product) return;
+  state.selectedProductId = product.id;
+  shopCheckoutDialogTitle.textContent = t("shop_checkout");
+  shopCheckoutForm.elements.productId.value = product.id;
+  shopCheckoutForm.elements.quantity.max = String(Math.max(1, Number(product.stock || 1)));
+  shopCheckoutForm.elements.quantity.value = "1";
+  shopCheckoutForm.elements.contactName.value = state.user?.displayName || "Demo Buyer";
+  renderShopCheckoutSummary(product);
+  if (typeof shopCheckoutDialog.showModal === "function") {
+    shopCheckoutDialog.showModal();
   }
 }
 
@@ -1421,6 +1718,17 @@ async function uploadListingFiles(formData) {
   });
 }
 
+async function uploadProductImage(formData) {
+  const file = formData.get("productImage");
+  if (!file || !file.size) return { file: null };
+  const files = new FormData();
+  files.append("productImage", file);
+  return apiFetch("/api/uploads/product-image", {
+    method: "POST",
+    body: files,
+  });
+}
+
 async function createEscrowIntent(listing) {
   openCheckoutDialog(listing.id);
 }
@@ -1472,6 +1780,109 @@ async function submitCheckout(payload) {
       item.id === payload.listingId ? { ...item, status: "sold" } : item,
     );
     state.view = "transactions";
+  }
+}
+
+async function submitProduct(event) {
+  event.preventDefault();
+  const data = new FormData(productForm);
+  try {
+    const uploadResult = await uploadProductImage(data);
+    const response = await apiFetch("/api/shop/products", {
+      method: "POST",
+      body: JSON.stringify({
+        title: data.get("title"),
+        category: data.get("category") || "other",
+        description: data.get("description"),
+        price: Number(data.get("price")),
+        stock: Number(data.get("stock")),
+        image: uploadResult.file?.url || "/assets/golden.png",
+      }),
+    });
+    state.products.unshift(response.product);
+    state.selectedProductId = response.product.id;
+    state.view = "shop";
+    productDialog.close();
+    render();
+  } catch (error) {
+    alert(`${t("product_publish_failed")}: ${error.message}`);
+  }
+}
+
+async function submitShopOrder(payload) {
+  const product = state.products.find((item) => item.id === payload.productId) || selectedProduct();
+  try {
+    const data = await apiFetch("/api/shop/orders", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+    state.shopOrders.unshift(data.order);
+    state.products = state.products.map((item) =>
+      item.id === payload.productId
+        ? { ...item, stock: Math.max(0, Number(item.stock || 0) - payload.quantity) }
+        : item,
+    );
+    state.view = "transactions";
+    if (data.payment?.checkoutUrl) {
+      window.location.assign(data.payment.checkoutUrl);
+    }
+  } catch (error) {
+    if (state.apiOnline) {
+      alert(`${t("shop_order_failed")}: ${error.message}`);
+      return;
+    }
+    const amounts = shopOrderAmounts(product, payload.quantity);
+    state.shopOrders.unshift({
+      id: `SO-DEMO-${Math.floor(Math.random() * 9000 + 1000)}`,
+      buyer: state.user?.displayName || "Demo Buyer",
+      seller: product.seller || t("verified_seller"),
+      items: [
+        {
+          productId: product.id,
+          title: product.title,
+          quantity: payload.quantity,
+          unitPrice: product.price,
+          lineTotal: amounts.subtotal,
+        },
+      ],
+      itemTitle: `${product.title} x${payload.quantity}`,
+      subtotal: amounts.subtotal,
+      commission: amounts.commission,
+      shipping: amounts.shipping,
+      sellerPayout: amounts.sellerPayout,
+      totalDue: amounts.totalDue,
+      contactName: payload.contactName,
+      contactPhone: payload.contactPhone,
+      shippingCountry: payload.shippingCountry,
+      shippingCity: payload.shippingCity,
+      shippingAddress: payload.shippingAddress,
+      buyerNote: payload.buyerNote,
+      status: "paid",
+    });
+    state.products = state.products.map((item) =>
+      item.id === payload.productId
+        ? { ...item, stock: Math.max(0, Number(item.stock || 0) - payload.quantity) }
+        : item,
+    );
+    state.view = "transactions";
+  }
+}
+
+async function continueShopPayment(orderId) {
+  try {
+    const data = await apiFetch(`/api/shop/orders/${orderId}/pay`, {
+      method: "POST",
+    });
+    if (data.payment?.checkoutUrl) {
+      window.location.assign(data.payment.checkoutUrl);
+      return;
+    }
+    if (data.order) {
+      state.shopOrders = state.shopOrders.map((order) => (order.id === orderId ? data.order : order));
+    }
+    render();
+  } catch (error) {
+    alert(error.message);
   }
 }
 
@@ -1639,7 +2050,7 @@ function renderDealPanel() {
 }
 
 function renderTransactions() {
-  transactionBody.innerHTML = state.orders
+  const petRows = state.orders
     .map((tx) => {
       const pending = tx.status === "payment_pending";
       const admin = state.user?.role === "admin";
@@ -1680,7 +2091,42 @@ function renderTransactions() {
     })
     .join("");
 
-  if (!state.orders.length) {
+  const shopRows = state.shopOrders
+    .map((order) => {
+      const pending = order.status === "payment_pending";
+      return `
+        <tr>
+          <td>${order.id}</td>
+          <td>${order.itemTitle || t("shop_order")}</td>
+          <td>${order.shippingCountry || "-"}</td>
+          <td>${order.buyer || "-"}</td>
+          <td>${money(order.totalDue || order.subtotal || 0)}</td>
+          <td>${money(order.commission || 0)}</td>
+          <td>
+            <span class="status ${pending ? "review" : "approved"}">${statusLabel(order.status)}</span>
+            ${pending ? `<button class="secondary-action" type="button" data-confirm-shop="${order.id}">${t("continue_payment")}</button>` : ""}
+            <button class="secondary-action" type="button" data-shop-order-detail="${order.id}">${t("order_detail")}</button>
+          </td>
+        </tr>
+        <tr class="order-detail-row is-hidden" data-shop-order-detail-row="${order.id}">
+          <td colspan="7">
+            <div class="detail-grid">
+              <div><span>${t("product_subtotal")}</span><strong>${money(order.subtotal || 0)}</strong></div>
+              <div><span>${t("shipping_fee")}</span><strong>${money(order.shipping || 0)}</strong></div>
+              <div><span>${t("shop_platform_fee")}</span><strong>${money(order.commission || 0)}</strong></div>
+              <div><span>${t("contact")}</span><strong>${order.contactName || "-"} · ${order.contactPhone || "-"}</strong></div>
+              <div><span>${t("destination")}</span><strong>${[order.shippingCity, order.shippingCountry].filter(Boolean).join(", ") || "-"}</strong></div>
+              <div><span>${t("shipping_address")}</span><strong>${order.shippingAddress || "-"}</strong></div>
+            </div>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  transactionBody.innerHTML = `${petRows}${shopRows}`;
+
+  if (!state.orders.length && !state.shopOrders.length) {
     transactionBody.innerHTML = `<tr><td colspan="7">${t("no_transactions")}</td></tr>`;
   }
 
@@ -1693,6 +2139,15 @@ function renderTransactions() {
   transactionBody.querySelectorAll("[data-order-detail]").forEach((button) => {
     button.addEventListener("click", () => {
       const row = transactionBody.querySelector(`[data-order-detail-row="${button.dataset.orderDetail}"]`);
+      row?.classList.toggle("is-hidden");
+    });
+  });
+  transactionBody.querySelectorAll("[data-confirm-shop]").forEach((button) => {
+    button.addEventListener("click", () => continueShopPayment(button.dataset.confirmShop));
+  });
+  transactionBody.querySelectorAll("[data-shop-order-detail]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const row = transactionBody.querySelector(`[data-shop-order-detail-row="${button.dataset.shopOrderDetail}"]`);
       row?.classList.toggle("is-hidden");
     });
   });
@@ -1765,7 +2220,8 @@ function renderWallet() {
   const fallbackWallet = {
     pending:
       state.orders.reduce((sum, order) => sum + Number(order.sellerPayout || 0), 0) +
-      state.bookings.reduce((sum, booking) => sum + Number(booking.providerPayout || 0), 0),
+      state.bookings.reduce((sum, booking) => sum + Number(booking.providerPayout || 0), 0) +
+      state.shopOrders.reduce((sum, order) => sum + Number(order.sellerPayout || 0), 0),
     settled: 0,
     available: 0,
     payouts: [],
@@ -1783,6 +2239,13 @@ function renderWallet() {
         title: bookingServiceTitle(booking),
         amount: booking.providerPayout || 0,
         status: booking.status,
+      })),
+      ...state.shopOrders.map((order) => ({
+        id: order.id,
+        type: "shop-order",
+        title: order.itemTitle || t("shop_order"),
+        amount: order.sellerPayout || 0,
+        status: order.status,
       })),
     ],
   };
@@ -1962,6 +2425,7 @@ function setView(view) {
   navItems.forEach((item) => item.classList.toggle("is-active", item.dataset.view === view));
   const titles = {
     market: "market_title",
+    shop: "shop_title",
     services: "services_title",
     bookings: "bookings_title",
     transactions: "transactions_title",
@@ -1982,12 +2446,16 @@ function render() {
   filterButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.filter === state.filter);
   });
+  shopFilterButtons.forEach((button) => {
+    button.classList.toggle("is-active", button.dataset.shopFilter === state.shopFilter);
+  });
   serviceFilterButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.serviceFilter === state.serviceFilter);
   });
   setView(state.view);
   renderMetrics();
   renderListings();
+  renderShop();
   renderServices();
   renderDealPanel();
   renderTransactions();
@@ -2003,17 +2471,21 @@ function render() {
 async function loadData() {
   try {
     const listingPath = state.user?.role === "admin" ? "/api/listings?all=true" : "/api/listings";
-    const [listingData, serviceData, orderData, bookingData, messageData, walletData] = await Promise.all([
+    const [listingData, productData, serviceData, orderData, shopOrderData, bookingData, messageData, walletData] = await Promise.all([
       apiFetch(listingPath),
+      apiFetch("/api/shop/products"),
       apiFetch("/api/services"),
       apiFetch("/api/orders").catch(() => ({ orders: [] })),
+      apiFetch("/api/shop/orders").catch(() => ({ orders: [] })),
       apiFetch("/api/service-bookings").catch(() => ({ bookings: [] })),
       apiFetch("/api/messages").catch(() => ({ messages: [] })),
       apiFetch("/api/wallet").catch(() => ({ wallet: null })),
     ]);
     state.listings = listingData.listings;
+    state.products = productData.products;
     state.services = serviceData.services;
     state.orders = orderData.orders;
+    state.shopOrders = shopOrderData.orders;
     state.bookings = bookingData.bookings;
     state.messages = messageData.messages.length ? messageData.messages : state.messages;
     state.wallet = walletData.wallet;
@@ -2029,7 +2501,12 @@ async function loadData() {
 
 function applyReturnParams() {
   const params = new URLSearchParams(window.location.search);
-  if (params.get("payment") === "stripe_success" || params.get("payment") === "stripe_cancelled") {
+  if (
+    params.get("payment") === "stripe_success" ||
+    params.get("payment") === "stripe_cancelled" ||
+    params.get("payment") === "shop_success" ||
+    params.get("payment") === "shop_cancelled"
+  ) {
     state.view = "transactions";
   }
   if (params.has("payment") || params.has("stripe_connect")) {
@@ -2057,6 +2534,12 @@ async function loadRuntimeConfig() {
     }
     if (typeof data.serviceCommissionRate === "number") {
       serviceCommissionRate = data.serviceCommissionRate;
+    }
+    if (typeof data.shopCommissionRate === "number") {
+      shopCommissionRate = data.shopCommissionRate;
+    }
+    if (typeof data.shopShippingFeeCents === "number") {
+      shopShippingFeeCents = data.shopShippingFeeCents;
     }
     if (!i18nConfig.enabled) {
       currentLang = i18nConfig.defaultLang;
@@ -2130,6 +2613,13 @@ filterButtons.forEach((button) => {
   });
 });
 
+shopFilterButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    state.shopFilter = button.dataset.shopFilter;
+    render();
+  });
+});
+
 serviceFilterButtons.forEach((button) => {
   button.addEventListener("click", () => {
     state.serviceFilter = button.dataset.serviceFilter;
@@ -2140,6 +2630,7 @@ serviceFilterButtons.forEach((button) => {
 searchInput.addEventListener("input", (event) => {
   state.query = event.target.value;
   renderListings();
+  renderShop();
   renderServices();
 });
 
@@ -2162,6 +2653,12 @@ navItems.forEach((item) => {
 newListingBtn.addEventListener("click", () => {
   if (typeof listingDialog.showModal === "function") {
     listingDialog.showModal();
+  }
+});
+
+newProductBtn.addEventListener("click", () => {
+  if (typeof productDialog.showModal === "function") {
+    productDialog.showModal();
   }
 });
 
@@ -2206,6 +2703,11 @@ listingForm.addEventListener("submit", async (event) => {
   }
 });
 
+productForm.addEventListener("submit", async (event) => {
+  if (event.submitter?.value === "cancel") return;
+  await submitProduct(event);
+});
+
 bookingForm.addEventListener("submit", async (event) => {
   if (event.submitter?.value === "cancel") return;
   event.preventDefault();
@@ -2238,6 +2740,28 @@ checkoutForm.addEventListener("submit", async (event) => {
     kycConfirmed: data.get("kycConfirmed") === "on",
   });
   checkoutDialog.close();
+  render();
+});
+
+shopCheckoutForm.elements.quantity.addEventListener("input", () => {
+  renderShopCheckoutSummary(selectedProduct());
+});
+
+shopCheckoutForm.addEventListener("submit", async (event) => {
+  if (event.submitter?.value === "cancel") return;
+  event.preventDefault();
+  const data = new FormData(shopCheckoutForm);
+  await submitShopOrder({
+    productId: data.get("productId"),
+    quantity: Number(data.get("quantity")),
+    contactName: data.get("contactName"),
+    contactPhone: data.get("contactPhone"),
+    shippingCountry: data.get("shippingCountry"),
+    shippingCity: data.get("shippingCity"),
+    shippingAddress: data.get("shippingAddress"),
+    buyerNote: data.get("buyerNote"),
+  });
+  shopCheckoutDialog.close();
   render();
 });
 

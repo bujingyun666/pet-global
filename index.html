@@ -83,6 +83,10 @@
             <i data-lucide="store" aria-hidden="true"></i>
             市场
           </button>
+          <button class="nav-item" data-view="shop">
+            <i data-lucide="shopping-bag" aria-hidden="true"></i>
+            商店
+          </button>
           <button class="nav-item" data-view="services">
             <i data-lucide="hand-heart" aria-hidden="true"></i>
             投喂
@@ -140,6 +144,9 @@
             <button class="icon-button" id="newListingBtn" type="button" aria-label="发布宠物" title="发布宠物">
               <i data-lucide="plus" aria-hidden="true"></i>
             </button>
+            <button class="icon-button" id="newProductBtn" type="button" aria-label="上架商品" title="上架商品">
+              <i data-lucide="package-plus" aria-hidden="true"></i>
+            </button>
           </div>
         </header>
 
@@ -182,6 +189,21 @@
             <div class="listing-grid" id="listingGrid"></div>
             <aside class="deal-panel" id="dealPanel" aria-live="polite"></aside>
           </div>
+        </section>
+
+        <section class="view-panel is-hidden" id="shopView">
+          <div class="filters-row" aria-label="Shop filters">
+            <button class="filter-pill is-active" data-shop-filter="all">全部商品</button>
+            <button class="filter-pill" data-shop-filter="food">宠物食品</button>
+            <button class="filter-pill" data-shop-filter="toys">宠物玩具</button>
+            <button class="filter-pill" data-shop-filter="clothing">宠物衣服</button>
+            <button class="filter-pill" data-shop-filter="housing">窝垫笼具</button>
+            <button class="filter-pill" data-shop-filter="health">健康用品</button>
+            <button class="filter-pill" data-shop-filter="grooming">洗护用品</button>
+            <button class="filter-pill" data-shop-filter="travel">出行用品</button>
+            <button class="filter-pill" data-shop-filter="other">其他用品</button>
+          </div>
+          <div class="service-grid-wide" id="shopGrid"></div>
         </section>
 
         <section class="view-panel is-hidden" id="servicesView">
@@ -482,6 +504,103 @@
         <button class="primary-action" value="default" type="submit">
           <i data-lucide="shield-check" aria-hidden="true"></i>
           提交托管订单
+        </button>
+      </form>
+    </dialog>
+
+    <dialog id="productDialog">
+      <form method="dialog" class="dialog-panel" id="productForm" enctype="multipart/form-data">
+        <header>
+          <h3>上架商品</h3>
+          <button class="ghost-icon" value="cancel" type="submit" aria-label="关闭" title="关闭">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+        </header>
+        <label>
+          商品名称
+          <input name="title" value="Premium pet food starter pack" required />
+        </label>
+        <div class="form-grid two-cols">
+          <label>
+            商品分类
+            <select name="category">
+              <option value="food">宠物食品</option>
+              <option value="toys">宠物玩具</option>
+              <option value="clothing">宠物衣服</option>
+              <option value="housing">窝垫笼具</option>
+              <option value="health">健康用品</option>
+              <option value="grooming">洗护用品</option>
+              <option value="travel">出行用品</option>
+              <option value="other">其他用品</option>
+            </select>
+          </label>
+          <label>
+            库存
+            <input name="stock" type="number" min="0" step="1" value="25" required />
+          </label>
+        </div>
+        <label>
+          商品描述
+          <textarea name="description" rows="3" required>Suitable for daily feeding, training and home care.</textarea>
+        </label>
+        <label>
+          商品图片
+          <input name="productImage" type="file" accept="image/png,image/jpeg,image/webp" />
+        </label>
+        <label>
+          价格 USD
+          <input name="price" type="number" min="1" step="0.01" value="39.99" required />
+        </label>
+        <button class="primary-action" value="default" type="submit">
+          <i data-lucide="package-plus" aria-hidden="true"></i>
+          提交商品
+        </button>
+      </form>
+    </dialog>
+
+    <dialog id="shopCheckoutDialog">
+      <form method="dialog" class="dialog-panel checkout-form" id="shopCheckoutForm">
+        <header>
+          <h3 id="shopCheckoutDialogTitle">购买商品</h3>
+          <button class="ghost-icon" value="cancel" type="submit" aria-label="关闭" title="关闭">
+            <i data-lucide="x" aria-hidden="true"></i>
+          </button>
+        </header>
+        <input name="productId" type="hidden" />
+        <div class="checkout-summary" id="shopCheckoutSummary"></div>
+        <div class="form-grid two-cols">
+          <label>
+            数量
+            <input name="quantity" type="number" min="1" step="1" value="1" required />
+          </label>
+          <label>
+            联系人
+            <input name="contactName" value="Demo Buyer" required />
+          </label>
+          <label>
+            联系电话
+            <input name="contactPhone" value="+1 555 0188" required />
+          </label>
+          <label>
+            收货国家
+            <input name="shippingCountry" value="United States" required />
+          </label>
+          <label>
+            收货城市
+            <input name="shippingCity" value="Los Angeles" required />
+          </label>
+        </div>
+        <label>
+          收货地址
+          <input name="shippingAddress" value="1200 Petcare Ave, Los Angeles, CA" required />
+        </label>
+        <label>
+          订单备注
+          <input name="buyerNote" value="Please ship with tracking." />
+        </label>
+        <button class="primary-action" value="default" type="submit">
+          <i data-lucide="credit-card" aria-hidden="true"></i>
+          提交商品订单
         </button>
       </form>
     </dialog>

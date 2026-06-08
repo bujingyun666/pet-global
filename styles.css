@@ -1062,7 +1062,7 @@ dialog::backdrop {
 
   .topbar-actions {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 86px 42px;
+    grid-template-columns: minmax(0, 1fr) 86px 42px 42px;
   }
 
   .metrics-grid {

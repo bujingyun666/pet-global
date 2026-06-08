@@ -73,6 +73,70 @@ export async function createStripeCheckoutSession({
   };
 }
 
+export async function createStripeShopCheckoutSession({
+  orderId,
+  order,
+  buyer,
+  successUrl,
+  cancelUrl,
+}) {
+  if (!stripe) throw new Error("Stripe is not configured");
+
+  const currency = String(order.currency || "USD").toLowerCase();
+  const session = await stripe.checkout.sessions.create(
+    {
+      mode: "payment",
+      success_url: `${successUrl}?payment=shop_success&order=${encodeURIComponent(orderId)}`,
+      cancel_url: `${cancelUrl}?payment=shop_cancelled&order=${encodeURIComponent(orderId)}`,
+      customer_email: buyer.email,
+      client_reference_id: orderId,
+      line_items: [
+        {
+          quantity: 1,
+          price_data: {
+            currency,
+            unit_amount: order.totalDueCents,
+            product_data: {
+              name: `PetGlobal shop order ${orderId}`,
+              description: order.description,
+              metadata: {
+                shop_order_id: orderId,
+              },
+            },
+          },
+        },
+      ],
+      metadata: {
+        order_id: orderId,
+        order_type: "shop",
+        buyer_id: String(buyer.id),
+        seller_id: String(order.sellerId),
+      },
+      payment_intent_data: {
+        metadata: {
+          order_id: orderId,
+          order_type: "shop",
+          buyer_id: String(buyer.id),
+          seller_id: String(order.sellerId),
+          platform_fee_cents: String(order.totalDueCents - order.sellerPayoutCents),
+          seller_payout_cents: String(order.sellerPayoutCents),
+        },
+        transfer_group: orderId,
+      },
+    },
+    { idempotencyKey: `shop_checkout_${orderId}` },
+  );
+
+  return {
+    provider: "stripe",
+    orderId,
+    checkoutSessionId: session.id,
+    paymentIntentId: typeof session.payment_intent === "string" ? session.payment_intent : session.id,
+    checkoutUrl: session.url,
+    status: session.payment_status || session.status,
+  };
+}
+
 export function constructStripeWebhookEvent(payload, signature) {
   if (!stripe) throw new Error("Stripe is not configured");
   if (!stripeWebhookSecret) throw new Error("Stripe webhook secret is not configured");
