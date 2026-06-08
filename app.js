@@ -76,6 +76,13 @@ const i18nLang = {
     small_mammal: "小型哺乳",
     birds: "鸟类",
     equine: "马匹",
+    reptiles: "爬行动物",
+    aquatic: "水族鱼类",
+    amphibians: "两栖动物",
+    invertebrates: "昆虫节肢",
+    farm_animals: "农场动物",
+    exotic_pets: "异宠",
+    other_species: "其他",
     view: "查看",
     create_trade: "创建交易",
     approved: "已认证",
@@ -178,6 +185,7 @@ const i18nLang = {
     total_income: "总收入",
     close: "关闭",
     submit_review: "提交审核",
+    pet_species: "宠物种类",
     breed: "品种",
     price_usd: "价格 USD",
     demo_data: "演示数据",
@@ -306,6 +314,13 @@ const i18nLang = {
     small_mammal: "Small mammals",
     birds: "Birds",
     equine: "Equine",
+    reptiles: "Reptiles",
+    aquatic: "Aquatic fish",
+    amphibians: "Amphibians",
+    invertebrates: "Insects and arthropods",
+    farm_animals: "Farm animals",
+    exotic_pets: "Exotic pets",
+    other_species: "Other",
     view: "View",
     create_trade: "Create trade",
     approved: "Verified",
@@ -408,6 +423,7 @@ const i18nLang = {
     total_income: "Total income",
     close: "Close",
     submit_review: "Submit for review",
+    pet_species: "Pet species",
     breed: "Breed",
     price_usd: "Price USD",
     demo_data: "Demo data",
@@ -512,6 +528,21 @@ function translateStatusKey(status) {
   return t(status);
 }
 
+const listingSpeciesOptions = [
+  ["Dog", "dogs"],
+  ["Cat", "cats"],
+  ["Small mammal", "small_mammal"],
+  ["Bird", "birds"],
+  ["Equine", "equine"],
+  ["Reptile", "reptiles"],
+  ["Aquatic", "aquatic"],
+  ["Amphibian", "amphibians"],
+  ["Invertebrate", "invertebrates"],
+  ["Farm animal", "farm_animals"],
+  ["Exotic pet", "exotic_pets"],
+  ["Other", "other_species"],
+];
+
 const symbols = {
   USD: "$",
   EUR: "EUR ",
@@ -614,6 +645,54 @@ const fallbackListings = [
     status: "approved",
     route: "Madrid -> Doha -> Miami",
     risk: "low",
+  },
+  {
+    id: "PG-24121",
+    name: "Echo",
+    species: "Reptile",
+    breed: "Leopard Gecko",
+    age: "10 months",
+    country: "United States",
+    seller: "Desert Line Exotics",
+    price: 420,
+    priceCents: 42000,
+    image: "./assets/hero.png",
+    docs: ["Health cert", "Seller ID", "Import screen"],
+    status: "review",
+    route: "Phoenix -> Los Angeles",
+    risk: "medium",
+  },
+  {
+    id: "PG-24127",
+    name: "Nami",
+    species: "Aquatic",
+    breed: "Koi Carp",
+    age: "18 months",
+    country: "Japan",
+    seller: "Kyoto Pond Farm",
+    price: 960,
+    priceCents: 96000,
+    image: "./assets/carecat.png",
+    docs: ["Aquatic health cert", "Seller ID"],
+    status: "approved",
+    route: "Osaka -> Honolulu -> San Francisco",
+    risk: "low",
+  },
+  {
+    id: "PG-24132",
+    name: "Clover",
+    species: "Farm animal",
+    breed: "Nigerian Dwarf Goat",
+    age: "8 months",
+    country: "Ireland",
+    seller: "Green Pasture Farm",
+    price: 1300,
+    priceCents: 130000,
+    image: "./assets/golden.png",
+    docs: ["Vet exam", "Movement permit", "Seller ID"],
+    status: "review",
+    route: "Dublin -> London -> Boston",
+    risk: "medium",
   },
 ];
 
@@ -979,6 +1058,15 @@ function setSelectOptionText(select, value, text) {
   if (option) option.textContent = text;
 }
 
+function renderSpeciesSelect(select) {
+  if (!select) return;
+  const selected = select.value || "Dog";
+  select.innerHTML = listingSpeciesOptions
+    .map(([value, key]) => `<option value="${value}">${t(key)}</option>`)
+    .join("");
+  select.value = selected;
+}
+
 function renderAllPageText() {
   document.documentElement.lang = currentLang === "zh" ? "zh-CN" : "en";
   document.title = currentLang === "zh" ? "PetGlobal Trade - 全球宠物交易与投喂服务" : "PetGlobal Trade - Global Pet Trade and Care";
@@ -1023,14 +1111,7 @@ function renderAllPageText() {
   [t("active_items"), t("monthly_gmv"), t("platform_fees"), t("compliance_pass_rate")].forEach((text, index) => {
     if (metricLabels[index]) metricLabels[index].textContent = text;
   });
-  const listingFilters = [
-    ["all", "all"],
-    ["Dog", "dogs"],
-    ["Cat", "cats"],
-    ["Small mammal", "small_mammal"],
-    ["Bird", "birds"],
-    ["Equine", "equine"],
-  ];
+  const listingFilters = [["all", "all"], ...listingSpeciesOptions];
   listingFilters.forEach(([value, key]) => {
     const button = document.querySelector(`[data-filter="${value}"]`);
     if (button) button.textContent = t(key);
@@ -1095,8 +1176,10 @@ function renderAllPageText() {
   const listingLabels = listingForm.querySelectorAll("label");
   setText("#listingForm h3", t("publish_pet"));
   if (listingLabels[0]) listingLabels[0].childNodes[0].textContent = `${t("pet_name")} `;
-  if (listingLabels[1]) listingLabels[1].childNodes[0].textContent = `${t("breed")} `;
-  if (listingLabels[2]) listingLabels[2].childNodes[0].textContent = `${t("country")} `;
+  if (listingLabels[1]) listingLabels[1].childNodes[0].textContent = `${t("pet_species")} `;
+  if (listingLabels[2]) listingLabels[2].childNodes[0].textContent = `${t("breed")} `;
+  if (listingLabels[3]) listingLabels[3].childNodes[0].textContent = `${t("country")} `;
+  renderSpeciesSelect(listingForm.elements.species);
   const priceLabel = listingForm.querySelector('input[name="price"]')?.closest("label");
   if (priceLabel) priceLabel.childNodes[0].textContent = `${t("price_usd")} `;
   listingForm.querySelector(".primary-action").lastChild.textContent = ` ${t("submit_review")}`;
@@ -2093,7 +2176,7 @@ listingForm.addEventListener("submit", async (event) => {
       method: "POST",
       body: JSON.stringify({
         name: data.get("name"),
-        species: "Dog",
+        species: data.get("species") || "Dog",
         breed: data.get("breed"),
         age: data.get("age") || "Pending",
         country: data.get("country"),

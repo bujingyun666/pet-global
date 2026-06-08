@@ -170,6 +170,13 @@
             <button class="filter-pill" data-filter="Small mammal">小型哺乳</button>
             <button class="filter-pill" data-filter="Bird">鸟类</button>
             <button class="filter-pill" data-filter="Equine">马匹</button>
+            <button class="filter-pill" data-filter="Reptile">爬行动物</button>
+            <button class="filter-pill" data-filter="Aquatic">水族鱼类</button>
+            <button class="filter-pill" data-filter="Amphibian">两栖动物</button>
+            <button class="filter-pill" data-filter="Invertebrate">昆虫节肢</button>
+            <button class="filter-pill" data-filter="Farm animal">农场动物</button>
+            <button class="filter-pill" data-filter="Exotic pet">异宠</button>
+            <button class="filter-pill" data-filter="Other">其他</button>
           </div>
           <div class="market-layout">
             <div class="listing-grid" id="listingGrid"></div>
@@ -313,10 +320,29 @@
           宠物名称
           <input name="name" value="Milo" required />
         </label>
-        <label>
-          品种
-          <input name="breed" value="Golden Retriever" required />
-        </label>
+        <div class="form-grid two-cols">
+          <label>
+            宠物种类
+            <select name="species" required>
+              <option value="Dog">犬类</option>
+              <option value="Cat">猫类</option>
+              <option value="Small mammal">小型哺乳</option>
+              <option value="Bird">鸟类</option>
+              <option value="Equine">马匹</option>
+              <option value="Reptile">爬行动物</option>
+              <option value="Aquatic">水族鱼类</option>
+              <option value="Amphibian">两栖动物</option>
+              <option value="Invertebrate">昆虫节肢</option>
+              <option value="Farm animal">农场动物</option>
+              <option value="Exotic pet">异宠</option>
+              <option value="Other">其他</option>
+            </select>
+          </label>
+          <label>
+            品种
+            <input name="breed" value="Golden Retriever" required />
+          </label>
+        </div>
         <label>
           国家
           <input name="country" value="Canada" required />
