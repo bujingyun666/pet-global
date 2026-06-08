@@ -38,8 +38,17 @@ const uploadRoot = path.resolve(projectRoot, process.env.UPLOAD_DIR || "./data/u
 fs.mkdirSync(uploadRoot, { recursive: true });
 const app = express();
 const port = Number(process.env.PORT || 4174);
-const commissionRate = Number(process.env.COMMISSION_RATE || 0.08);
-const defaultServiceFeeCents = 18000;
+const defaultServiceFeeCents = Number(process.env.DEFAULT_SERVICE_FEE_CENTS || 18000);
+const commissionPolicy = {
+  lowThresholdCents: Number(process.env.COMMISSION_LOW_THRESHOLD_CENTS || 100000),
+  highThresholdCents: Number(process.env.COMMISSION_HIGH_THRESHOLD_CENTS || 500000),
+  lowRate: Number(process.env.COMMISSION_TIER_LOW || 0.1),
+  midRate: Number(process.env.COMMISSION_TIER_MID || process.env.COMMISSION_RATE || 0.08),
+  highRate: Number(process.env.COMMISSION_TIER_HIGH || 0.06),
+  capCents: Number(process.env.COMMISSION_CAP_CENTS || 80000),
+  serviceFeeCents: defaultServiceFeeCents,
+};
+const serviceCommissionRate = Number(process.env.SERVICE_COMMISSION_RATE || 0.15);
 const publicAppUrl = String(process.env.PUBLIC_APP_URL || "http://127.0.0.1:4174").replace(/\/$/, "");
 const backendBaseUrl = String(process.env.BACKEND_BASE_URL || publicAppUrl).replace(/\/$/, "");
 const paymentProvider = !process.env.MOCK_PAYMENT_MODE || process.env.MOCK_PAYMENT_MODE === "true"
@@ -391,12 +400,22 @@ function centsFromPrice(price) {
   return Math.round(price * 100);
 }
 
+function commissionRateForPrice(priceCents) {
+  if (priceCents < commissionPolicy.lowThresholdCents) return commissionPolicy.lowRate;
+  if (priceCents <= commissionPolicy.highThresholdCents) return commissionPolicy.midRate;
+  return commissionPolicy.highRate;
+}
+
 function calculateOrderAmounts(priceCents) {
-  const commissionCents = Math.round(priceCents * commissionRate);
-  const serviceFeeCents = defaultServiceFeeCents;
+  const commissionRate = commissionRateForPrice(priceCents);
+  const rawCommissionCents = Math.round(priceCents * commissionRate);
+  const commissionCents = commissionPolicy.capCents > 0
+    ? Math.min(rawCommissionCents, commissionPolicy.capCents)
+    : rawCommissionCents;
+  const serviceFeeCents = commissionPolicy.serviceFeeCents;
   const sellerPayoutCents = priceCents - Math.round(priceCents * 0.015);
   const totalDueCents = priceCents + commissionCents + serviceFeeCents;
-  return { commissionCents, serviceFeeCents, sellerPayoutCents, totalDueCents };
+  return { commissionCents, commissionRate, serviceFeeCents, sellerPayoutCents, totalDueCents };
 }
 
 function formatCents(value, currency = "USD") {
@@ -629,12 +648,16 @@ app.get("/api/health", (_req, res) => {
     paymentProvider,
     stripeConfigured: isStripeConfigured(),
     mockPaymentMode: paymentProvider === "mock",
+    commissionPolicy,
+    serviceCommissionRate,
   });
 });
 
 app.get("/api/config", (_req, res) => {
   res.json({
     i18n: i18nRuntimeConfig,
+    commissionPolicy,
+    serviceCommissionRate,
     payments: {
       provider: paymentProvider,
       stripeConfigured: isStripeConfigured(),
@@ -720,7 +743,7 @@ app.post("/api/service-bookings", requireAuth, requireRole("buyer", "admin"), (r
   }
 
   const bookingId = `BK-${nanoid(9).toUpperCase()}`;
-  const commissionCents = Math.round(service.price_cents * 0.1);
+  const commissionCents = Math.round(service.price_cents * serviceCommissionRate);
   const providerPayoutCents = service.price_cents - commissionCents;
   db.prepare(`
     INSERT INTO service_bookings (

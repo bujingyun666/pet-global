@@ -10,6 +10,17 @@ const i18nConfig = {
   defaultLang: "en",
 };
 
+const commissionPolicy = {
+  lowThresholdCents: 100000,
+  highThresholdCents: 500000,
+  lowRate: 0.1,
+  midRate: 0.08,
+  highRate: 0.06,
+  capCents: 80000,
+  serviceFeeCents: 18000,
+};
+let serviceCommissionRate = 0.15;
+
 const runtimeConfig = window.PETGLOBAL_CONFIG || {};
 const apiBaseUrl = String(runtimeConfig.apiBaseUrl || "").replace(/\/$/, "");
 
@@ -161,6 +172,7 @@ const i18nLang = {
     fee_calculator: "手续费计算",
     sale_price: "成交价",
     platform_rate: "平台费率",
+    commission_policy_note: "低于 {low} 抽 {lowRate}，{low}-{high} 抽 {midRate}，高于 {high} 抽 {highRate}，佣金封顶 {cap}。",
     compliance_service_fee: "跨境合规服务费",
     platform_commission: "平台佣金",
     total_income: "总收入",
@@ -390,6 +402,7 @@ const i18nLang = {
     fee_calculator: "Fee calculator",
     sale_price: "Sale price",
     platform_rate: "Platform rate",
+    commission_policy_note: "Under {low}: {lowRate}; {low}-{high}: {midRate}; above {high}: {highRate}; commission capped at {cap}.",
     compliance_service_fee: "Cross-border compliance service fee",
     platform_commission: "Platform commission",
     total_income: "Total income",
@@ -833,12 +846,41 @@ function walletItemType(type) {
   return type;
 }
 
+function commissionRateForPrice(priceCents) {
+  if (priceCents < commissionPolicy.lowThresholdCents) return commissionPolicy.lowRate;
+  if (priceCents <= commissionPolicy.highThresholdCents) return commissionPolicy.midRate;
+  return commissionPolicy.highRate;
+}
+
+function percentLabel(rate) {
+  const percent = Number(rate || 0) * 100;
+  return `${percent.toFixed(percent % 1 ? 1 : 0)}%`;
+}
+
+function commissionPolicyText() {
+  return t("commission_policy_note")
+    .replaceAll("{low}", money(commissionPolicy.lowThresholdCents / 100))
+    .replaceAll("{high}", money(commissionPolicy.highThresholdCents / 100))
+    .replace("{lowRate}", percentLabel(commissionPolicy.lowRate))
+    .replace("{midRate}", percentLabel(commissionPolicy.midRate))
+    .replace("{highRate}", percentLabel(commissionPolicy.highRate))
+    .replace("{cap}", money(commissionPolicy.capCents / 100));
+}
+
 function orderAmounts(listing) {
   const price = Number(listing?.price || 0);
-  const fee = Number((price * 0.08 + 180).toFixed(2));
+  const priceCents = Math.round(price * 100);
+  const commissionRate = commissionRateForPrice(priceCents);
+  const rawCommissionCents = Math.round(priceCents * commissionRate);
+  const commissionCents = commissionPolicy.capCents > 0
+    ? Math.min(rawCommissionCents, commissionPolicy.capCents)
+    : rawCommissionCents;
+  const serviceFee = Number((commissionPolicy.serviceFeeCents / 100).toFixed(2));
+  const commission = Number((commissionCents / 100).toFixed(2));
+  const fee = Number((commission + serviceFee).toFixed(2));
   const sellerPayout = Number((price - price * 0.015).toFixed(2));
   const totalDue = Number((price + fee).toFixed(2));
-  return { price, fee, sellerPayout, totalDue };
+  return { price, commission, commissionRate, serviceFee, fee, sellerPayout, totalDue };
 }
 
 function optionLabel(value) {
@@ -1048,6 +1090,7 @@ function renderAllPageText() {
   if (calcLabels[0]) calcLabels[0].childNodes[0].textContent = `${t("sale_price")} `;
   if (calcLabels[1]) calcLabels[1].childNodes[0].textContent = `${t("platform_rate")} `;
   if (calcLabels[2]) calcLabels[2].childNodes[0].textContent = `${t("compliance_service_fee")} `;
+  setText("#commissionPolicyText", commissionPolicyText());
 
   const listingLabels = listingForm.querySelectorAll("label");
   setText("#listingForm h3", t("publish_pet"));
@@ -1261,8 +1304,8 @@ async function submitBooking(payload) {
       serviceTime: payload.serviceTime,
       note: payload.note,
       amount: service?.price || 0,
-      commission: Number(((service?.price || 0) * 0.1).toFixed(2)),
-      providerPayout: Number(((service?.price || 0) * 0.9).toFixed(2)),
+      commission: Number(((service?.price || 0) * serviceCommissionRate).toFixed(2)),
+      providerPayout: Number(((service?.price || 0) * (1 - serviceCommissionRate)).toFixed(2)),
       status: "requested",
     });
     state.view = "bookings";
@@ -1487,8 +1530,7 @@ async function startStripeConnect(event) {
 function renderDealPanel() {
   const listing = selectedListing();
   if (!listing) return;
-  const fee = Number((listing.price * 0.08 + 180).toFixed(2));
-  const sellerPayout = Number((listing.price - listing.price * 0.015).toFixed(2));
+  const amounts = orderAmounts(listing);
   const canBuy = listing.status === "approved" && state.user?.role !== "seller";
   dealPanel.innerHTML = `
     <img src="${assetUrl(listing.image)}" alt="${listing.name} transaction preview" />
@@ -1497,8 +1539,8 @@ function renderDealPanel() {
       <p>${listing.route}</p>
       <div class="fee-lines">
         <div><span>${t("pet_price")}</span><strong>${money(listing.price)}</strong></div>
-        <div><span>${t("expected_platform_income")}</span><strong>${money(fee)}</strong></div>
-        <div><span>${t("expected_seller_payout")}</span><strong>${money(sellerPayout)}</strong></div>
+        <div><span>${t("expected_platform_income")}</span><strong>${money(amounts.fee)}</strong></div>
+        <div><span>${t("expected_seller_payout")}</span><strong>${money(amounts.sellerPayout)}</strong></div>
       </div>
       <p>${t("backend_calculates")}</p>
       <button class="primary-action" type="button" id="dealAction" ${canBuy ? "" : "disabled"}>
@@ -1794,11 +1836,15 @@ function renderCompliance() {
 
 function renderCalculator() {
   const price = Number(calcPrice.value || 0);
-  const rate = Number(calcRate.value || 0);
   const service = Number(calcService.value || 0);
-  const commission = price * (rate / 100);
+  const rate = commissionRateForPrice(Math.round(price * 100));
+  const rawCommission = price * rate;
+  const cap = commissionPolicy.capCents > 0 ? commissionPolicy.capCents / 100 : Infinity;
+  const commission = Math.min(rawCommission, cap);
   const totalFee = commission + service;
-  rateValue.textContent = `${rate}%`;
+  calcRate.value = String(rate * 100);
+  rateValue.textContent = percentLabel(rate);
+  setText("#commissionPolicyText", commissionPolicyText());
   calcOutput.innerHTML = `
     <span>${t("platform_commission")} ${money(commission)}</span>
     <span>${t("compliance_service_fee")} ${money(service)}</span>
@@ -1920,6 +1966,15 @@ async function loadRuntimeConfig() {
     if (!data.i18n) return;
     i18nConfig.enabled = data.i18n.enabled !== false;
     i18nConfig.defaultLang = normalizeLang(data.i18n.defaultLang);
+    if (data.commissionPolicy) {
+      Object.assign(commissionPolicy, data.commissionPolicy);
+      if (calcService) {
+        calcService.value = String(Number(commissionPolicy.serviceFeeCents || 0) / 100);
+      }
+    }
+    if (typeof data.serviceCommissionRate === "number") {
+      serviceCommissionRate = data.serviceCommissionRate;
+    }
     if (!i18nConfig.enabled) {
       currentLang = i18nConfig.defaultLang;
       localStorage.removeItem("petopia_lang");

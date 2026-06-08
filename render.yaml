@@ -19,8 +19,22 @@ services:
         value: /opt/render/project/src/data/petglobal.sqlite
       - key: UPLOAD_DIR
         value: /opt/render/project/src/data/uploads
-      - key: COMMISSION_RATE
+      - key: COMMISSION_LOW_THRESHOLD_CENTS
+        value: "100000"
+      - key: COMMISSION_HIGH_THRESHOLD_CENTS
+        value: "500000"
+      - key: COMMISSION_TIER_LOW
+        value: "0.10"
+      - key: COMMISSION_TIER_MID
         value: "0.08"
+      - key: COMMISSION_TIER_HIGH
+        value: "0.06"
+      - key: COMMISSION_CAP_CENTS
+        value: "80000"
+      - key: DEFAULT_SERVICE_FEE_CENTS
+        value: "18000"
+      - key: SERVICE_COMMISSION_RATE
+        value: "0.15"
       - key: MOCK_PAYMENT_MODE
         value: "true"
       - key: PUBLIC_APP_URL
