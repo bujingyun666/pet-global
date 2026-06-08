@@ -100,6 +100,8 @@ const i18nLang = {
     exotic_pets: "异宠",
     other_species: "其他",
     view: "查看",
+    pet_detail: "宠物详情",
+    open_pet_detail: "查看宠物详情",
     create_trade: "创建交易",
     approved: "已认证",
     review: "审核中",
@@ -314,6 +316,20 @@ const i18nLang = {
     today_1800: "今天 18:00",
     photo_note: "回传照片",
     feeding_note: "按平时食量投喂，回传照片",
+    detail_overview: "基础信息",
+    detail_trade_terms: "交易与结算",
+    detail_compliance_docs: "合规资料",
+    detail_route: "运输路线",
+    detail_seller: "卖家信息",
+    detail_age: "年龄",
+    detail_status: "当前状态",
+    detail_risk: "风险等级",
+    detail_compliance_status: "合规状态",
+    low: "低",
+    medium: "中",
+    high: "高",
+    pending: "待处理",
+    start_escrow_trade: "发起托管交易",
     merchant_cta_auth: "商家入驻",
     merchant_back_login: "登录交易台",
     merchant_public_eyebrow: "SELL ON PETGLOBAL",
@@ -443,6 +459,8 @@ const i18nLang = {
     exotic_pets: "Exotic pets",
     other_species: "Other",
     view: "View",
+    pet_detail: "Pet detail",
+    open_pet_detail: "View pet detail",
     create_trade: "Create trade",
     approved: "Verified",
     review: "In review",
@@ -657,6 +675,20 @@ const i18nLang = {
     today_1800: "Today 18:00",
     photo_note: "Return photos",
     feeding_note: "Feed normal portion and return photos",
+    detail_overview: "Overview",
+    detail_trade_terms: "Trade and settlement",
+    detail_compliance_docs: "Compliance documents",
+    detail_route: "Transport route",
+    detail_seller: "Seller information",
+    detail_age: "Age",
+    detail_status: "Current status",
+    detail_risk: "Risk level",
+    detail_compliance_status: "Compliance status",
+    low: "Low",
+    medium: "Medium",
+    high: "High",
+    pending: "Pending",
+    start_escrow_trade: "Start escrow trade",
     merchant_cta_auth: "Seller onboarding",
     merchant_back_login: "Log in to workspace",
     merchant_public_eyebrow: "SELL ON PETGLOBAL",
@@ -1142,6 +1174,10 @@ const checkoutDialog = document.querySelector("#checkoutDialog");
 const checkoutForm = document.querySelector("#checkoutForm");
 const checkoutDialogTitle = document.querySelector("#checkoutDialogTitle");
 const checkoutSummary = document.querySelector("#checkoutSummary");
+const petDetailDialog = document.querySelector("#petDetailDialog");
+const petDetailDialogTitle = document.querySelector("#petDetailDialogTitle");
+const petDetailContent = document.querySelector("#petDetailContent");
+const petDetailCloseBtn = document.querySelector("#petDetailCloseBtn");
 const newListingBtn = document.querySelector("#newListingBtn");
 const newProductBtn = document.querySelector("#newProductBtn");
 const listingForm = document.querySelector("#listingForm");
@@ -1743,6 +1779,7 @@ function renderAllPageText() {
   productForm.querySelector(".primary-action").lastChild.textContent = ` ${t("submit_product")}`;
 
   setText("#checkoutDialogTitle", t("checkout_order"));
+  setText("#petDetailDialogTitle", t("pet_detail"));
   const checkoutLabels = checkoutForm.querySelectorAll("label");
   if (checkoutLabels[0]) checkoutLabels[0].childNodes[0].textContent = `${t("contact_name")} `;
   if (checkoutLabels[1]) checkoutLabels[1].childNodes[0].textContent = `${t("contact_phone")} `;
@@ -1813,7 +1850,9 @@ function renderListings() {
       const canBuy = listing.status === "approved" && state.user?.role !== "seller";
       return `
         <article class="listing-card ${listing.id === state.selectedId ? "is-selected" : ""}">
-          <img src="${assetUrl(listing.image)}" alt="${listing.breed} listing from ${listing.country}" />
+          <button class="listing-image-button" type="button" data-detail="${listing.id}" aria-label="${t("open_pet_detail")}">
+            <img src="${assetUrl(listing.image)}" alt="${listing.breed} listing from ${listing.country}" />
+          </button>
           <div class="listing-body">
             <div class="listing-head">
               <div>
@@ -1850,9 +1889,15 @@ function renderListings() {
     listingGrid.innerHTML = `<article class="listing-card"><div class="listing-body"><h3>${t("no_listings")}</h3><p>${t("adjust_filters")}</p></div></article>`;
   }
 
-  listingGrid.querySelectorAll("[data-select], [data-buy]").forEach((button) => {
+  listingGrid.querySelectorAll("[data-detail], [data-select], [data-buy]").forEach((button) => {
     button.addEventListener("click", async () => {
-      state.selectedId = button.dataset.select || button.dataset.buy;
+      state.selectedId = button.dataset.detail || button.dataset.select || button.dataset.buy;
+      if (button.dataset.detail || button.dataset.select) {
+        openPetDetail(state.selectedId);
+        renderDealPanel();
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
       if (button.dataset.buy) await createEscrowIntent(selectedListing());
       render();
     });
@@ -1901,6 +1946,105 @@ function renderShop() {
   shopGrid.querySelectorAll("[data-buy-product]").forEach((button) => {
     button.addEventListener("click", () => openShopCheckoutDialog(button.dataset.buyProduct));
   });
+}
+
+function renderPetDetail(listing) {
+  if (!listing || !petDetailContent) return;
+  const amounts = orderAmounts(listing);
+  const canBuy = listing.status === "approved" && state.user?.role !== "seller";
+  const docs = Array.isArray(listing.docs) && listing.docs.length ? listing.docs : ["Seller ID"];
+  petDetailDialogTitle.textContent = `${t("pet_detail")} · ${listing.name}`;
+  petDetailContent.innerHTML = `
+    <article class="pet-detail-layout">
+      <div class="pet-detail-media">
+        <img src="${assetUrl(listing.image)}" alt="${listing.breed} listing from ${listing.country}" />
+      </div>
+      <div class="pet-detail-body">
+        <div class="pet-detail-head">
+          <div>
+            <p class="eyebrow">${t("live_marketplace")}</p>
+            <h3>${listing.name}</h3>
+            <p>${listing.breed} · ${listing.age}</p>
+          </div>
+          <span class="price">${money(listing.price)}</span>
+        </div>
+
+        <div class="pet-detail-section">
+          <h3>${t("detail_overview")}</h3>
+          <div class="detail-grid">
+            <div><span>${t("pet_species")}</span><strong>${t(listingSpeciesOptions.find(([value]) => value === listing.species)?.[1] || "other_species")}</strong></div>
+            <div><span>${t("breed")}</span><strong>${listing.breed}</strong></div>
+            <div><span>${t("detail_age")}</span><strong>${listing.age}</strong></div>
+            <div><span>${t("country")}</span><strong>${listing.country}</strong></div>
+            <div><span>${t("detail_seller")}</span><strong>${listing.seller || t("verified_seller")}</strong></div>
+            <div><span>${t("detail_status")}</span><strong>${statusLabel(listing.status)}</strong></div>
+          </div>
+        </div>
+
+        <div class="pet-detail-section">
+          <h3>${t("detail_trade_terms")}</h3>
+          <div class="detail-grid">
+            <div><span>${t("pet_subtotal")}</span><strong>${money(amounts.price)}</strong></div>
+            <div><span>${t("platform_escrow_fee")}</span><strong>${money(amounts.fee)}</strong></div>
+            <div><span>${t("expected_seller_payout")}</span><strong>${money(amounts.sellerPayout)}</strong></div>
+            <div><span>${t("protection_period")}</span><strong>${t("days_7")}</strong></div>
+          </div>
+          <p>${t("backend_calculates")}</p>
+        </div>
+
+        <div class="pet-detail-section">
+          <h3>${t("detail_compliance_docs")}</h3>
+          <div class="doc-row">
+            ${docs.map((doc) => `<span class="doc-chip">${doc}</span>`).join("")}
+          </div>
+          <div class="detail-grid">
+            <div><span>${t("microchip_id")}</span><strong>${listing.microchipId || "-"}</strong></div>
+            <div><span>${t("export_country")}</span><strong>${listing.exportCountry || listing.country || "-"}</strong></div>
+            <div><span>${t("import_country")}</span><strong>${listing.importCountry || "-"}</strong></div>
+            <div><span>${t("detail_compliance_status")}</span><strong>${statusLabel(listing.complianceStatus || "pending")}</strong></div>
+            <div><span>${t("detail_risk")}</span><strong>${t(listing.risk || "low")}</strong></div>
+            <div><span>${t("seller_identity")}</span><strong>${listing.sellerLegalName || listing.seller || t("verified_seller")}</strong></div>
+          </div>
+        </div>
+
+        <div class="pet-detail-section">
+          <h3>${t("detail_route")}</h3>
+          <p>${listing.route || "-"}</p>
+        </div>
+
+        <div class="pet-detail-actions">
+          <button class="secondary-action" type="button" data-close-pet-detail>
+            <i data-lucide="arrow-left" aria-hidden="true"></i>
+            ${t("close")}
+          </button>
+          <button class="primary-action" type="button" data-detail-buy="${listing.id}" ${canBuy ? "" : "disabled"}>
+            <i data-lucide="lock-keyhole" aria-hidden="true"></i>
+            ${t("start_escrow_trade")}
+          </button>
+        </div>
+      </div>
+    </article>
+  `;
+
+  petDetailContent.querySelector("[data-close-pet-detail]")?.addEventListener("click", () => {
+    petDetailDialog.close();
+  });
+  petDetailContent.querySelector("[data-detail-buy]")?.addEventListener("click", async () => {
+    petDetailDialog.close();
+    await createEscrowIntent(listing);
+    render();
+  });
+}
+
+function openPetDetail(listingId) {
+  const listing = state.listings.find((item) => item.id === listingId);
+  if (!listing) return;
+  state.selectedId = listing.id;
+  renderPetDetail(listing);
+  if (typeof petDetailDialog.showModal === "function") {
+    petDetailDialog.showModal();
+  }
+  if (window.lucide) window.lucide.createIcons();
 }
 
 function renderServices() {
@@ -2421,7 +2565,9 @@ function renderDealPanel() {
   const amounts = orderAmounts(listing);
   const canBuy = listing.status === "approved" && state.user?.role !== "seller";
   dealPanel.innerHTML = `
-    <img src="${assetUrl(listing.image)}" alt="${listing.name} transaction preview" />
+    <button class="deal-image-button" type="button" id="dealDetailAction" aria-label="${t("open_pet_detail")}">
+      <img src="${assetUrl(listing.image)}" alt="${listing.name} transaction preview" />
+    </button>
     <div class="deal-body">
       <h3>${listing.name} · ${listing.breed}</h3>
       <p>${listing.route}</p>
@@ -2431,12 +2577,18 @@ function renderDealPanel() {
         <div><span>${t("expected_seller_payout")}</span><strong>${money(amounts.sellerPayout)}</strong></div>
       </div>
       <p>${t("backend_calculates")}</p>
+      <button class="secondary-action" type="button" id="dealViewDetail">
+        <i data-lucide="scan-eye" aria-hidden="true"></i>
+        ${t("pet_detail")}
+      </button>
       <button class="primary-action" type="button" id="dealAction" ${canBuy ? "" : "disabled"}>
         <i data-lucide="badge-dollar-sign" aria-hidden="true"></i>
         ${t("create_trade")}
       </button>
     </div>
   `;
+  dealPanel.querySelector("#dealDetailAction").addEventListener("click", () => openPetDetail(listing.id));
+  dealPanel.querySelector("#dealViewDetail").addEventListener("click", () => openPetDetail(listing.id));
   dealPanel.querySelector("#dealAction").addEventListener("click", async () => {
     await createEscrowIntent(listing);
     render();
@@ -2981,6 +3133,9 @@ roleSelect.addEventListener("change", () => {
 
 openMerchantLandingBtn?.addEventListener("click", showMerchantPublicPage);
 merchantBackToLoginBtn?.addEventListener("click", showLoginPage);
+petDetailCloseBtn?.addEventListener("click", () => {
+  petDetailDialog.close();
+});
 
 if (langSelect) {
   langSelect.value = currentLang;
