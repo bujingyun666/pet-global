@@ -1,0 +1,55 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; width: 1200px; height: 628px; overflow: hidden; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #fff; background: #12332f; }
+    .poster { position: relative; width: 1200px; height: 628px; overflow: hidden; background: #12332f; }
+    .bg { position: absolute; inset: 0; display: grid; grid-template-columns: 42% 24% 34%; opacity: .45; }
+    .bg img { width: 100%; height: 100%; object-fit: cover; filter: saturate(1.05) contrast(1.05); }
+    .veil { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(13,55,50,.96), rgba(13,55,50,.84) 45%, rgba(238,246,243,.82)); }
+    .brand { position: absolute; top: 42px; left: 54px; display: flex; align-items: center; gap: 16px; }
+    .mark { width: 60px; height: 60px; border-radius: 12px; display: grid; place-items: center; background: #0f7b70; font-size: 26px; font-weight: 950; }
+    .brand strong { display: block; font-size: 31px; line-height: 1; }
+    .brand span { display: block; margin-top: 6px; color: #a7e5db; font-size: 14px; font-weight: 900; letter-spacing: .12em; }
+    .copy { position: absolute; left: 54px; top: 138px; width: 660px; }
+    .eyebrow { margin: 0 0 14px; color: #9fe3d9; font-size: 20px; font-weight: 950; letter-spacing: .13em; }
+    h1 { margin: 0; font-size: 64px; line-height: .98; font-weight: 950; letter-spacing: 0; }
+    .sub { margin: 20px 0 0; width: 620px; color: #e8f7f4; font-size: 26px; line-height: 1.26; font-weight: 820; }
+    .en { margin: 14px 0 0; width: 610px; color: #bde6df; font-size: 19px; line-height: 1.35; font-weight: 740; }
+    .features { position: absolute; left: 54px; bottom: 48px; display: flex; gap: 12px; }
+    .features div { min-width: 154px; border-radius: 14px; padding: 13px 15px; background: rgba(255,255,255,.94); color: #12332f; box-shadow: 0 16px 34px rgba(0,0,0,.18); }
+    .features strong { display: block; font-size: 19px; line-height: 1.05; }
+    .features span { display: block; margin-top: 6px; color: #58706b; font-size: 13px; font-weight: 800; }
+    .qr-card { position: absolute; right: 56px; top: 86px; width: 306px; border-radius: 20px; padding: 22px; background: rgba(255,255,255,.95); color: #12332f; box-shadow: 0 24px 54px rgba(18,33,31,.20); }
+    .qr-card h2 { margin: 0 0 15px; font-size: 28px; line-height: 1.08; }
+    .qr-card img { width: 174px; height: 174px; display: block; margin: 0 auto 14px; }
+    .qr-card p { margin: 0; color: #0d5f58; text-align: center; font-size: 18px; line-height: 1.2; font-weight: 950; }
+    .cta { position: absolute; right: 56px; bottom: 52px; width: 306px; border-radius: 16px; padding: 17px 20px; background: #0f7b70; box-shadow: 0 18px 38px rgba(15,123,112,.25); }
+    .cta strong { display: block; font-size: 25px; line-height: 1.12; }
+    .cta span { display: block; margin-top: 7px; color: #d7f5f0; font-size: 15px; font-weight: 820; }
+  </style>
+</head>
+<body>
+  <main class="poster">
+    <div class="bg"><img src="../assets/dog.jpg"><img src="../assets/cat.jpg"><img src="../assets/cockatiel.jpg"></div>
+    <div class="veil"></div>
+    <div class="brand"><div class="mark">PG</div><div><strong>PetGlobal</strong><span>GLOBAL PET ESCROW MARKET</span></div></div>
+    <section class="copy">
+      <p class="eyebrow">BUY · SELL · ESCROW · GLOBAL</p>
+      <h1>Global Pet Marketplace</h1>
+      <p class="sub">Verified pets, pet supplies, grooming and care services in one platform for global buyers.</p>
+      <p class="en">Escrow payments, certified sellers, compliance files, multilingual storefronts, and seller onboarding.</p>
+    </section>
+    <section class="features">
+      <div><strong>Escrow Trade</strong><span>Protected payment</span></div>
+      <div><strong>Verified Sellers</strong><span>Identity & files</span></div>
+      <div><strong>Global Display</strong><span>Multilingual</span></div>
+      <div><strong>Multi-Category</strong><span>Pets & supplies</span></div>
+    </section>
+    <aside class="qr-card"><h2>Scan to Visit<br>Start Trading</h2><img src="petglobal-qr.png"><p>pet-global-mocha.vercel.app</p></aside>
+    <div class="cta"><strong>Sellers Welcome · Global Reach</strong><span>Apply as a seller and grow with PetGlobal.</span></div>
+  </main>
+</body>
+</html>
